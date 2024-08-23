@@ -1,3 +1,5 @@
+import 'package:blogs_app/constants/constants.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -30,17 +32,28 @@ class _BlogPageState extends State<BlogPage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () {
-            setState(() {
+          IconButton(
+              onPressed: () {
+                setState(() {
                   isLiked = !isLiked;
                 });
-          }, icon: isLiked
-                  ? const Icon(Icons.favorite, color: Colors.red,)
+              },
+              icon: isLiked
+                  ? const Icon(
+                      Icons.favorite,
+                      color: Colors.red,
+                    )
                   : const Icon(Icons.favorite_border)),
           IconButton(
               onPressed: () {
                 setState(() {
-                  isSaved = !isSaved;
+                  if(!isSaved){
+                    showSnackBar(context, 'Blog Added to Favourites!');
+                    isSaved = true;
+                  } else{
+                    showSnackBar(context, 'Blog Removed from Favourites.');
+                    isSaved = false;
+                  }
                 });
               },
               icon: isSaved
@@ -118,6 +131,73 @@ class _BlogPageState extends State<BlogPage> {
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                     fontSize: 16),
+              ),
+              SizedBox(
+                height: screenHeight * 0.04,
+              ),
+              const Text(
+                'Comments (0)',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: screenHeight * 0.02,
+              ),
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Constants.yellow,
+                    radius: 30,
+                    child: const Icon(
+                      Icons.person,
+                      size: 35,
+                    ), // Adjust the radius to control the size of the circle
+                  ),
+                  SizedBox(
+                    width: screenWidth * 0.02,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Add a comment ...',
+                        hintStyle: const TextStyle(color: Colors.white),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.025,
+                          horizontal: screenWidth * 0.04,
+                        ),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.zero, // Rectangular shape
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Constants.yellow, width: 2.0),
+                          borderRadius: BorderRadius.circular(
+                              screenWidth * 0.04), // Rectangular shape
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Constants.yellow, width: 2.0),
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.04),
+                          // Rectangular shape
+                        ),
+                      ),
+                      minLines: 1,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      // validator: (value) {
+                      //   if (value == null || value.isEmpty) {
+                      //     return 'Please enter your email';
+                      //   }
+                      //   return null;
+                      // },
+                    ),
+                  ),
+                  IconButton(onPressed: (){}, icon: Icon(Icons.file_upload_outlined, color: Constants.yellow, size: 30,))
+                ],
               )
             ],
           ),

@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
       ),
       appBar: AppBar(
         title: const Text(
-          'VibeVerse',
+          'VerseVibe',
           style: TextStyle(
               color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
         ),
