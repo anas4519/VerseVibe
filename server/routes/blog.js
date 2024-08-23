@@ -17,7 +17,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); // Corrected the typo here
 
 const router = Router();
-
 router.post("/", upload.single("coverImage"), async (req, res) => {
     console.log(req.body);
 

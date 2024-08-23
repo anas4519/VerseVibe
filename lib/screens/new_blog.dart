@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:blogs_app/providers/user_provider.dart';
+import 'package:blogs_app/screens/home_screen.dart';
 import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/constants/constants.dart';
 import 'package:flutter/material.dart';
@@ -46,20 +47,19 @@ class _NewBlogState extends State<NewBlog> {
 
       if (response.statusCode == 200) {
         showSnackBar(context, 'Blog posted successfully!');
-        Navigator.of(context).pop();
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (ctx) => HomeScreen()),
+            (route) => false);
       } else {
-        print('Failed with status: ${response.statusCode}');
         showSnackBar(context,
             'Failed to post blog. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error: $e');
       showSnackBar(context, 'Error: $e');
     }
   }
 
   Future<void> _pickImage() async {
-    print("Clciked");
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {

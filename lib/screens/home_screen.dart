@@ -22,10 +22,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: screenHeight * 0.05, right: screenWidth * 0.03),
+        padding: EdgeInsets.only(
+            bottom: screenHeight * 0.05, right: screenWidth * 0.03),
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => NewBlog()));
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (ctx) => NewBlog()));
           },
           backgroundColor: Constants.yellow,
           shape: const CircleBorder(),
@@ -35,7 +37,8 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'VibeVerse',
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Constants.bg,
@@ -66,18 +69,31 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(screenWidth*0.04),
-              child: const Align(alignment: Alignment.centerLeft, child: Text('Explore', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),)),
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              child: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Explore',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  )),
             ),
             FutureBuilder<List<Blog>>(
-              future: ApiService().fetchBlogs(), // Ensure this returns Future<List<Blog>>
+              future: ApiService()
+                  .fetchBlogs(), // Ensure this returns Future<List<Blog>>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No blogs available.', style: TextStyle(color: Colors.white),));
+                  return Center(
+                      child: Text(
+                    'No blogs available.',
+                    style: TextStyle(color: Colors.white),
+                  ));
                 } else {
                   final blogs = snapshot.data!;
                   return SingleChildScrollView(
@@ -90,7 +106,8 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               BlogCard(
-                                coverImage: Image.asset('assets/IMG_20240628_133857066.jpg'),
+                                coverImage: Image.network(
+                                    'http://192.168.1.5:8000/images${blog.coverImage}'),
                                 author: blog.author,
                                 date: blog.date,
                                 profileImage: Image.asset('name'),
