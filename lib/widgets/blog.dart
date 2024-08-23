@@ -1,3 +1,4 @@
+import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/screens/blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -45,7 +46,8 @@ class BlogCard extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
+          color: Colors.blueGrey[700]
+,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +69,7 @@ class BlogCard extends StatelessWidget {
                   top: 10, // Adjust positioning as needed
                   left: 10, // Adjust positioning as needed
                   child: IconButton(
-                    icon: const Icon(Icons.bookmark_border),
+                    icon: const Icon(Icons.bookmark_border, color: Colors.black,),
                     onPressed: () {
                       // Handle favorite button press
                     },
@@ -77,7 +79,7 @@ class BlogCard extends StatelessWidget {
                   top: 10, // Adjust positioning as needed
                   right: 10, // Adjust positioning as needed
                   child: IconButton(
-                    icon: const Icon(Icons.share, color: Colors.white),
+                    icon: const Icon(Icons.share, color: Colors.black),
                     onPressed: () {
                       // Handle share button press
                     },
@@ -85,9 +87,10 @@ class BlogCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
-              height: screenHeight * 0.02,
-            ),
+            // SizedBox(
+            //   height: screenHeight * 0.02,
+            // ),
+            const Divider(color: Colors.white,),
             Text(
               title,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
