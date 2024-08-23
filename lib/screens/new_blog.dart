@@ -48,7 +48,7 @@ class _NewBlogState extends State<NewBlog> {
       if (response.statusCode == 200) {
         showSnackBar(context, 'Blog posted successfully!');
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (ctx) => HomeScreen()),
+            MaterialPageRoute(builder: (ctx) => const HomeScreen()),
             (route) => false);
       } else {
         showSnackBar(context,

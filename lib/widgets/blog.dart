@@ -1,3 +1,4 @@
+import 'package:blogs_app/screens/blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,6 +8,7 @@ class BlogCard extends StatelessWidget {
   final Image profileImage;
   final String author;
   final DateTime date;
+  final String body;
   // final String body;
   const BlogCard(
       {super.key,
@@ -14,14 +16,30 @@ class BlogCard extends StatelessWidget {
       required this.author,
       required this.date,
       required this.profileImage,
-      required this.title});
+      required this.title,
+      required this.body});
+  String calculateReadTime(String body) {
+    final wordCount = body.split(' ').length;
+    final readTime =
+        (wordCount / 238).ceil(); // Round up to the nearest whole number
+    return 'Read Time: $readTime min';
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (ctx) => BlogPage(
+                  body: body,
+                  coverImage: coverImage,
+                  author: author,
+                  date: date,
+                  title: title,
+                )));
+      },
       child: Container(
         padding: EdgeInsets.all(screenWidth * 0.02),
         width: double.infinity,
@@ -38,7 +56,7 @@ class BlogCard extends StatelessWidget {
                   width: double.infinity,
                   height: screenHeight * 0.25, // Adjust the height as needed
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.04),
                     image: DecorationImage(
                       image: coverImage.image,
                       fit: BoxFit.cover,
@@ -49,7 +67,7 @@ class BlogCard extends StatelessWidget {
                   top: 10, // Adjust positioning as needed
                   left: 10, // Adjust positioning as needed
                   child: IconButton(
-                    icon: const Icon(Icons.favorite_border),
+                    icon: const Icon(Icons.bookmark_border),
                     onPressed: () {
                       // Handle favorite button press
                     },
@@ -59,7 +77,7 @@ class BlogCard extends StatelessWidget {
                   top: 10, // Adjust positioning as needed
                   right: 10, // Adjust positioning as needed
                   child: IconButton(
-                    icon: const Icon(Icons.bookmark_border, color: Colors.white),
+                    icon: const Icon(Icons.share, color: Colors.white),
                     onPressed: () {
                       // Handle share button press
                     },
@@ -102,9 +120,9 @@ class BlogCard extends StatelessWidget {
                     SizedBox(
                       height: screenHeight * 0.005,
                     ),
-                    const Text(
-                      'Read Time : 5 min',
-                      style: TextStyle(
+                    Text(
+                      calculateReadTime(body),
+                      style: const TextStyle(
                           fontSize: 10,
                           color: Colors.green,
                           fontWeight: FontWeight.bold),

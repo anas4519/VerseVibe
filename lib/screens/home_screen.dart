@@ -89,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
+                  return const Center(
                       child: Text(
                     'No blogs available.',
                     style: TextStyle(color: Colors.white),
@@ -98,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                   final blogs = snapshot.data!;
                   return SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.06),
+                      padding: EdgeInsets.all(screenWidth * 0.04),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: blogs.map((blog) {
@@ -112,6 +112,7 @@ class HomeScreen extends StatelessWidget {
                                 date: blog.date,
                                 profileImage: Image.asset('name'),
                                 title: blog.title,
+                                body: blog.body,
                               ),
                               SizedBox(height: screenHeight * 0.02),
                             ],

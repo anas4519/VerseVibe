@@ -5,6 +5,7 @@ class Blog {
   final DateTime date;
   final String profileImage;
   final String title;
+  final String body;
 
   Blog({
     required this.coverImage,
@@ -12,6 +13,7 @@ class Blog {
     required this.date,
     required this.profileImage,
     required this.title,
+    required this.body
   });
 
   factory Blog.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class Blog {
       date: DateTime.parse(json['createdAt']),
       profileImage: json['profileImage'] ?? '', // Adjust this based on your API response
       title: json['title'] ?? '',
+      body: json['body'] ?? ''
     );
   }
 }
