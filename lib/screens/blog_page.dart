@@ -55,7 +55,6 @@ class _BlogPageState extends State<BlogPage> {
     final String url = '${Constants.url}blogs/comment/${widget.blog_id}';
     final String userId =
         Provider.of<UserProvider>(context, listen: false).user.id;
-    print("User id = " +userId);
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -69,7 +68,6 @@ class _BlogPageState extends State<BlogPage> {
       );
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
         showSnackBar(context, 'Comment posted Successfuly!');
       } else {
         showSnackBar(context,
