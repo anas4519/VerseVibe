@@ -1,4 +1,4 @@
-# blogs_app
+# VerseVibe
 
 A new Flutter project.
 
