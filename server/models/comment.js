@@ -7,7 +7,7 @@ const commentSchema = new Schema({
     },
     blogId: {
         type: Schema.Types.ObjectId,
-        ref: "user"
+        ref: "blog"
     },
     createdBy: {
         type: Schema.Types.ObjectId,

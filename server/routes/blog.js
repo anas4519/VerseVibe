@@ -3,7 +3,8 @@ const multer = require("multer");
 const path = require("path");
 const { Blog } = require("../models/blog"); // Ensure Blog is correctly imported
 const { User } = require("../models/user")
-const {Comment} = require("../models/comment")
+const { Comment } = require("../models/comment");
+const { log } = require("console");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -56,13 +57,22 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/comment/:blogId', async (req, res)=>{
+router.post('/comment/:blogId', async (req, res) => {
     const comment = await Comment.create({
         content: req.body.content,
         blogId: req.params.blogId,
-        createdBy: req.user_id
+        createdBy: req.body.createdBy,
     })
-    return res.json({status: "successful"})
+    return res.json({ comment: comment })
+})
+
+router.get("/comment/:id", async (req, res) => {
+    const comments = await Comment.find({ blogId: req.params.id })
+        .populate({
+            path: 'createdBy',
+            select: 'fullName' // Select only the fullName field
+        }).sort({ createdAt: -1 });
+    return res.json(comments);
 })
 
 module.exports = router;

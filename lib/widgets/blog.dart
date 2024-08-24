@@ -9,6 +9,7 @@ class BlogCard extends StatelessWidget {
   final String author;
   final DateTime date;
   final String body;
+  final String id;
   // final String body;
   const BlogCard(
       {super.key,
@@ -17,7 +18,7 @@ class BlogCard extends StatelessWidget {
       required this.date,
       required this.profileImage,
       required this.title,
-      required this.body});
+      required this.body, required this.id});
   String calculateReadTime(String body) {
     final wordCount = body.split(' ').length;
     final readTime =
@@ -38,6 +39,7 @@ class BlogCard extends StatelessWidget {
                   author: author,
                   date: date,
                   title: title,
+                  blog_id: id,
                 )));
       },
       child: Container(

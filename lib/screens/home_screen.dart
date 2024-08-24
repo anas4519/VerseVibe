@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: () {
             Navigator.of(context)
-                .push(MaterialPageRoute(builder: (ctx) => NewBlog()));
+                .push(MaterialPageRoute(builder: (ctx) => const NewBlog()));
           },
           backgroundColor: Constants.yellow,
           shape: const CircleBorder(),
@@ -107,12 +107,13 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               BlogCard(
                                 coverImage: Image.network(
-                                    'http://192.168.1.5:8000/images${blog.coverImage}'),
+                                    'http://192.168.1.3:8000/images${blog.coverImage}'),
                                 author: blog.author,
                                 date: blog.date,
                                 profileImage: Image.asset('name'),
                                 title: blog.title,
                                 body: blog.body,
+                                id: blog.id,
                               ),
                               SizedBox(height: screenHeight * 0.02),
                             ],

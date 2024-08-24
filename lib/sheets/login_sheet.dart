@@ -1,3 +1,4 @@
+import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/home_screen.dart';
 import 'package:blogs_app/sheets/register_sheet.dart';
@@ -35,7 +36,7 @@ class _LoginSheetState extends State<LoginSheet> {
 
   Future<void> postData(
       String email, String password, BuildContext context) async {
-    final url = Uri.parse('http://192.168.1.5:8000/user/signin');
+    final url = Uri.parse('${Constants.url}user/signin');
     final headers = {
       'Content-Type': 'application/json',
     };

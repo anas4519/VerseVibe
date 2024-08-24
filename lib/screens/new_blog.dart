@@ -21,11 +21,12 @@ class _NewBlogState extends State<NewBlog> {
   final _bodyController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
+  
 
   Future<void> postData(
       String title, String body, XFile image, BuildContext context) async {
     final url = Uri.parse(
-        'http://192.168.1.5:8000/blogs/'); // Replace with your actual URL
+        'http://192.168.1.3:8000/blogs/'); // Replace with your actual URL
 
     try {
       var request = http.MultipartRequest('POST', url);
@@ -34,7 +35,7 @@ class _NewBlogState extends State<NewBlog> {
       request.fields['title'] = title;
       request.fields['body'] = body;
       request.fields['user_id'] = user.id;
-
+      
       // Add the image file to the request
       var stream = http.ByteStream(image.openRead());
       stream.cast();
