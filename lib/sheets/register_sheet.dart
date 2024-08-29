@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:blogs_app/constants/constants.dart';
+import 'package:blogs_app/landing/verfiy_otp.dart';
 import 'package:blogs_app/sheets/login_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,16 +37,20 @@ class _RegisterSheetState extends State<RegisterSheet> {
     }
   }
 
-  void _onSignUpComplete() {
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Registerd Successfully, Login with the same credentials!'),
-    ));
-  }
+  // void _onSignUpComplete() {
+  //   Navigator.of(context).pop();
+  //   Navigator.of(context).push(MaterialPageRoute(
+  //       builder: (ctx) => VerifyOtp(
+  //             email: _emailController.text,
+  //           )));
+  //   // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //   //   content: Text('Registerd Successfully, Login with the same credentials!'),
+  //   // ));
+  // }
 
   Future<void> postData(
       String name, String email, String password, BuildContext context) async {
-    final url = Uri.parse('http://192.168.1.4:8000/user/signup');
+    final url = Uri.parse('${Constants.uri}signup');
     final headers = {
       'Content-Type': 'application/json',
     };
@@ -60,7 +66,13 @@ class _RegisterSheetState extends State<RegisterSheet> {
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        _onSignUpComplete();
+        Navigator.of(context).pop();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (ctx) => VerifyOtp(
+                  email: email,
+                  name: name,
+                  password: password,
+                )));
       } else {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
@@ -196,6 +208,11 @@ class _RegisterSheetState extends State<RegisterSheet> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
+                  final emailRegex = RegExp(
+                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                  if (!emailRegex.hasMatch(value)) {
+                    return 'Please enter a valid email address';
+                  }
                   // You can add more validation logic here, like email format validation
                   return null;
                 },
@@ -238,6 +255,14 @@ class _RegisterSheetState extends State<RegisterSheet> {
                   }
                   if (value.length < 6) {
                     return 'Password must be at least 6 characters long';
+                  }
+                  final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+                  final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+                  final hasSpecialChar =
+                      RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(value);
+
+                  if (!hasLetter || !hasNumber || !hasSpecialChar) {
+                    return 'Password should contain letters, numbers, and special characters';
                   }
                   return null;
                 },

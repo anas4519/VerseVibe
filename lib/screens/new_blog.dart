@@ -26,7 +26,7 @@ class _NewBlogState extends State<NewBlog> {
   Future<void> postData(
       String title, String body, XFile image, BuildContext context) async {
     final url = Uri.parse(
-        'http://192.168.1.3:8000/blogs/'); // Replace with your actual URL
+        '${Constants.url}blogs/'); // Replace with your actual URL
 
     try {
       var request = http.MultipartRequest('POST', url);

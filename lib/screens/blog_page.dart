@@ -178,7 +178,7 @@ class _BlogPageState extends State<BlogPage> {
               SizedBox(
                 height: screenHeight * 0.02,
               ),
-              Text(
+              SelectableText(
                 widget.body,
                 style: const TextStyle(
                     color: Colors.white,
@@ -270,6 +270,7 @@ class _BlogPageState extends State<BlogPage> {
                             
                           }
                           FocusScope.of(context).unfocus();
+                          _commentController.clear();
                         },
                         icon: Icon(
                           Icons.arrow_upward_rounded,

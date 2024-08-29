@@ -1,6 +1,8 @@
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/home_screen.dart';
+import 'package:blogs_app/services/api_services.dart';
+import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/sheets/register_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -53,6 +55,7 @@ class _LoginSheetState extends State<LoginSheet> {
       if (response.statusCode == 200) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         userProvier.setUser(response.body);
+        AuthService().getUserData(context);
         await prefs.setString(
             'x-auth-token', jsonDecode(response.body)['token']);
         navigator.pushAndRemoveUntil(

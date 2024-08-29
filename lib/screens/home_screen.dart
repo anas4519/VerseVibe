@@ -1,3 +1,4 @@
+import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/widgets/blog.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,9 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> const UserProfile()));
+            },
             icon: const Icon(Icons.person, color: Colors.white),
           ),
         ],
@@ -107,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               BlogCard(
                                 coverImage: Image.network(
-                                    'http://192.168.1.3:8000/images${blog.coverImage}'),
+                                    '${Constants.url}images${blog.coverImage}'),
                                 author: blog.author,
                                 date: blog.date,
                                 profileImage: Image.asset('name'),
