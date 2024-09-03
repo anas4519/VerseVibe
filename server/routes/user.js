@@ -41,6 +41,8 @@ router.post("/tokenIsValid", async (req, res) => {
         if (!verified) return res.json(false);
         const userId = verified._id;
         const user = await User.findById(userId);
+        console.log(user.profileImageURL);
+
 
         if (!user) return res.json(false);
         return res.json(true);
@@ -53,7 +55,9 @@ router.post("/tokenIsValid", async (req, res) => {
 router.get('/', auth, async (req, res) => {
 
     const user = await User.findById(req.user);
-    res.json({ user: req.user, token: req.token, email: req.user.email, name: user.fullName, _id: user._id });
+    
+
+    res.json({token: req.token, email: req.user.email, name: user.fullName, _id: user._id, profileImageURL: user.profileImageURL });
 })
 
 router.post("/signup", async (req, res) => {
@@ -142,6 +146,7 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
+
 router.post('/upload-profile-image/:userId', upload.single('profileImage'), async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -155,6 +160,8 @@ router.post('/upload-profile-image/:userId', upload.single('profileImage'), asyn
             { profileImageURL: imageUrl },
             { new: true }
         );
+        console.log(user.profileImageURL);
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

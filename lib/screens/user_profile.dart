@@ -46,7 +46,7 @@ class _UserProfileState extends State<UserProfile> {
         final responseData = await http.Response.fromStream(response);
         final responseJson = jsonDecode(responseData.body);
         // Update user provider with new profile image URL
-        Provider.of<UserProvider>(context, listen: false).user.imageUrl =
+        Provider.of<UserProvider>(context, listen: false).user.profileImageURL =
             (responseJson['imageUrl']);
         showSnackBar(context, 'Profile image updated successfully');
       } else {
@@ -117,18 +117,18 @@ class _UserProfileState extends State<UserProfile> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          onTap: user.imageUrl != null
+                          onTap: user.profileImageURL != null
                               ? () =>
-                                  _viewFullScreenImage(context, user.imageUrl!)
+                                  _viewFullScreenImage(context, user.profileImageURL!)
                               : null,
                           child: CircleAvatar(
                             radius: 30,
                             backgroundColor: Constants.yellow,
-                            backgroundImage: user.imageUrl != null
+                            backgroundImage: user.profileImageURL != null
                                 ? NetworkImage(
-                                    '${Constants.url}${user.imageUrl!}')
+                                    '${Constants.url}${user.profileImageURL!}')
                                 : null,
-                            child: user.imageUrl == null
+                            child: user.profileImageURL == null
                                 ? IconButton(
                                     icon: const Icon(Icons.camera_alt_outlined),
                                     onPressed: _pickAndUploadImage,

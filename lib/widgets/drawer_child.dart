@@ -47,16 +47,16 @@ class DrawerChild extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: user.imageUrl != null
-                ? () => _viewFullScreenImage(context, user.imageUrl!)
+            onTap: user.profileImageURL != null
+                ? () => _viewFullScreenImage(context, user.profileImageURL!)
                 : null,
             child: CircleAvatar(
               radius: 30,
               backgroundColor: Constants.yellow,
-              backgroundImage: user.imageUrl != null
-                  ? NetworkImage('${Constants.url}${user.imageUrl!}')
+              backgroundImage: user.profileImageURL != null
+                  ? NetworkImage('${Constants.url}${user.profileImageURL!}')
                   : null,
-              child: user.imageUrl == null ? const Icon(Icons.person) : null,
+              child: user.profileImageURL == null ? const Icon(Icons.person) : null,
             ),
           ),
           SizedBox(
@@ -106,11 +106,11 @@ class DrawerChild extends StatelessWidget {
           ),
 
           ListTile(
-            // leading: Icon(
-            //  Text('AI'),
-            //   color: Constants.yellow,
-            // ),
-            leading: Text('AI', style: TextStyle(color: Constants.yellow, fontSize: 18)),
+            leading: Icon(
+             Icons.smart_toy_outlined,
+              color: Constants.yellow,
+            ),
+            // leading: Text('AI', style: TextStyle(color: Constants.yellow, fontSize: 18)),
             title: const Text(
               'Write With AI',
               style: TextStyle(color: Colors.white, fontSize: 16),

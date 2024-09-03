@@ -5,14 +5,14 @@ class User {
   final String name;
   final String email;
   final String token;
-  String? imageUrl;  // Use a String to store the image URL
+  String? profileImageURL;  // Use a String to store the image URL
 
   User({
     required this.id,
     required this.name,
     required this.email,
     required this.token,
-    this.imageUrl,
+    this.profileImageURL,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,7 +21,7 @@ class User {
       'name': name,
       'email': email,
       'token': token,
-      'image': imageUrl,  // Store the image as a URL string
+      'profileImageURL': profileImageURL,  // Store the image as a URL string
     };
   }
 
@@ -31,7 +31,7 @@ class User {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       token: map['token'] ?? '',
-      imageUrl: map['image'],  // Retrieve the image URL string
+      profileImageURL: map['profileImageURL'],  // Retrieve the image URL string
     );
   }
 

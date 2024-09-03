@@ -40,6 +40,7 @@ class AuthService {
             'x-auth-token': token
           },
         );
+        print(userRes.body);
         userProvider.setUser(userRes.body);
       }
     } catch (e) {

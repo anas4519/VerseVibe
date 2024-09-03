@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
+import 'package:blogs_app/screens/blog_Summary.dart';
 import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/widgets/comment_card.dart';
@@ -84,7 +85,7 @@ class _BlogPageState extends State<BlogPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final user = Provider.of<UserProvider>(context, listen: false).user;
-    
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -173,9 +174,18 @@ class _BlogPageState extends State<BlogPage> {
                     style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
                   const Spacer(),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.ios_share_rounded)),
+                  Row(
+                    children: [
+                      IconButton(onPressed: (){}, icon: const Icon(Icons.volume_up_rounded)),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> BlogSummary(blogBody: widget.body,)));
+                        },
+                        icon: const Icon(Icons.smart_toy_outlined),
+                        tooltip: 'Summarize',
+                      ),
+                    ],
+                  ),
                 ],
               ),
               SizedBox(
@@ -207,11 +217,13 @@ class _BlogPageState extends State<BlogPage> {
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: Constants.yellow,
-                    backgroundImage: user.imageUrl != null
-                        ? NetworkImage('${Constants.url}${user.imageUrl!}')
+                    backgroundImage: user.profileImageURL != null
+                        ? NetworkImage(
+                            '${Constants.url}${user.profileImageURL!}')
                         : null,
-                    child:
-                        user.imageUrl == null ? const Icon(Icons.person) : null,
+                    child: user.profileImageURL == null
+                        ? const Icon(Icons.person)
+                        : null,
                   ),
                   SizedBox(
                     width: screenWidth * 0.02,

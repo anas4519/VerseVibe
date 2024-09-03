@@ -65,10 +65,10 @@ class HomeScreen extends StatelessWidget {
               child: CircleAvatar(
                 radius: 30,
                 backgroundColor: Constants.yellow,
-                backgroundImage: user.imageUrl != null
-                    ? NetworkImage('${Constants.url}${user.imageUrl!}')
+                backgroundImage: user.profileImageURL != null
+                    ? NetworkImage('${Constants.url}${user.profileImageURL!}')
                     : null,
-                child: user.imageUrl == null ? const Icon(Icons.person) : null,
+                child: user.profileImageURL == null ? const Icon(Icons.person) : null,
               ),
             ),
           )

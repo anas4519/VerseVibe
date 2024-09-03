@@ -33,7 +33,7 @@ class _GeminiScreenState extends State<GeminiScreen> {
         currentUser = ChatUser(
             id: user.id,
             firstName: user.name,
-            profileImage: '${Constants.url}${user.imageUrl}');
+            profileImage: '${Constants.url}${user.profileImageURL}');
       });
     });
   }
@@ -88,13 +88,13 @@ class _GeminiScreenState extends State<GeminiScreen> {
                     hintText: 'Write a Message...',
                     labelStyle: const TextStyle(color: Colors.white),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                      borderRadius: BorderRadius.circular(screenWidth * 0.08),
                       borderSide: BorderSide(
                         color: Constants.yellow,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                      borderRadius: BorderRadius.circular(screenWidth * 0.08),
                       borderSide: BorderSide(
                         color: Constants.yellow,
                       ),
