@@ -4,11 +4,13 @@ const { auth } = require("../middlewares/auth")
 const { validateToken } = require("../services/auth")
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const multer = require("multer");
+const path = require("path");
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.EMAIL, 
+        user: process.env.EMAIL,
         pass: process.env.PASSWORD,
     },
 });
@@ -127,6 +129,43 @@ router.post("/verify-otp", async (req, res) => {
         return res.status(500).json({ status: "An error occurred during OTP verification" });
     }
 });
+
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.resolve(`./public/images/profileImages/`));
+    },
+    filename: function (req, file, cb) {
+        const fileName = `${Date.now()}-${file.originalname}`;
+        cb(null, fileName);
+    }
+});
+const upload = multer({ storage: storage });
+router.post('/upload-profile-image/:userId', upload.single('profileImage'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const file = req.file;
+        if (!file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+        const imageUrl = `/images/profileImages/${file.filename}`;
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { profileImageURL: imageUrl },
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ message: 'Profile image updated successfully', imageUrl });
+    } catch (error) {
+        console.error('Error updating profile image:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
 
 
 module.exports = router;

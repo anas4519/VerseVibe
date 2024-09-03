@@ -63,7 +63,8 @@ class _BlogPageState extends State<BlogPage> {
         },
         body: jsonEncode({
           'content': content,
-          'createdBy': userId, // If you have the user ID, pass it here or handle it server-side
+          'createdBy':
+              userId, // If you have the user ID, pass it here or handle it server-side
         }),
       );
 
@@ -82,6 +83,8 @@ class _BlogPageState extends State<BlogPage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -202,12 +205,13 @@ class _BlogPageState extends State<BlogPage> {
               Row(
                 children: [
                   CircleAvatar(
+                    radius: 30,
                     backgroundColor: Constants.yellow,
-                    radius: 25,
-                    child: const Icon(
-                      Icons.person,
-                      size: 30,
-                    ), // Adjust the radius to control the size of the circle
+                    backgroundImage: user.imageUrl != null
+                        ? NetworkImage('${Constants.url}${user.imageUrl!}')
+                        : null,
+                    child:
+                        user.imageUrl == null ? const Icon(Icons.person) : null,
                   ),
                   SizedBox(
                     width: screenWidth * 0.02,
@@ -267,7 +271,6 @@ class _BlogPageState extends State<BlogPage> {
                             setState(() {
                               _fetchAndSetComments();
                             });
-                            
                           }
                           FocusScope.of(context).unfocus();
                           _commentController.clear();
@@ -291,15 +294,17 @@ class _BlogPageState extends State<BlogPage> {
                 itemBuilder: (context, index) {
                   final comment = _comments[index];
                   final createdBy = comment['createdBy'] ?? {}; // Handle null
-                  final name =
-                      createdBy['fullName'] ?? 'Unknown'; // Provide a default name
+                  final name = createdBy['fullName'] ??
+                      'Unknown'; // Provide a default name
                   return Column(
                     children: [
                       CommentCard(
                         body: comment['content'] ?? 'No content', // Handle null
                         name: name,
                       ),
-                      SizedBox(height: screenHeight*0.02,)
+                      SizedBox(
+                        height: screenHeight * 0.02,
+                      )
                     ],
                   );
                 },

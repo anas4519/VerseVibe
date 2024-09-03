@@ -9,6 +9,18 @@ class ApiService {
 
   Future<List<Blog>> fetchBlogs() async {
     final response = await http.get(Uri.parse('$baseUrl/blogs'));
+    
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      return data.map((json) => Blog.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load blogs');
+    }
+  }
+  
+  Future<List<Blog>> fetchUserBlogs(String userID) async {
+    final response = await http.get(Uri.parse('$baseUrl/blogs/user/$userID'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       return data.map((json) => Blog.fromJson(json)).toList();
@@ -41,4 +53,7 @@ class ApiService {
       return [];
     }
   }
+
+
+  
 }

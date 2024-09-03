@@ -57,6 +57,23 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/user/:createdBy', async (req, res) => {
+    try {
+        const { createdBy } = req.params;
+
+        const allBlogs = await Blog.find({ createdBy })
+            .sort({ createdAt: -1 })
+            .populate('createdBy', 'fullName');
+
+        return res.json(allBlogs);
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 router.post('/comment/:blogId', async (req, res) => {
     const comment = await Comment.create({
         content: req.body.content,
