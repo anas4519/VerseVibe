@@ -5,10 +5,12 @@ import 'package:blogs_app/screens/home_screen.dart';
 import 'package:blogs_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  Gemini.init(apiKey: Constants.GEMINI_API_KEY);
   runApp(MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
       child: const MyApp()));

@@ -84,7 +84,7 @@ class _BlogPageState extends State<BlogPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final user = Provider.of<UserProvider>(context, listen: false).user;
-
+    
     return Scaffold(
       appBar: AppBar(
         actions: [

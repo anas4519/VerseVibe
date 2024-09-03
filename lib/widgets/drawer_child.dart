@@ -1,5 +1,6 @@
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
+import 'package:blogs_app/screens/gemini_screen.dart';
 import 'package:blogs_app/screens/new_blog.dart';
 import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/auth_service.dart';
@@ -103,6 +104,23 @@ class DrawerChild extends StatelessWidget {
                   .push(MaterialPageRoute(builder: ((ctx) => const NewBlog())));
             },
           ),
+
+          ListTile(
+            // leading: Icon(
+            //  Text('AI'),
+            //   color: Constants.yellow,
+            // ),
+            leading: Text('AI', style: TextStyle(color: Constants.yellow, fontSize: 18)),
+            title: const Text(
+              'Write With AI',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: ((ctx) => const GeminiScreen())));
+            },
+          ),
+
           ListTile(
             leading: Icon(
               Icons.person,

@@ -1,7 +1,6 @@
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/home_screen.dart';
-import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/sheets/register_sheet.dart';
 import 'package:flutter/material.dart';
