@@ -34,12 +34,12 @@ class _BlogSummaryState extends State<BlogSummary> {
   Future<void> generateSummary() async {
     try {
       final result = await gemini.text(
-        'Summarize the following blog post in a concise manner:\n\n${widget.blogBody}'
-      );
+          'Summarize the following blog post in a concise manner:\n\n${widget.blogBody}');
 
       setState(() {
         if (result != null && result.content != null) {
-          summary = result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
+          summary =
+              result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
         } else {
           summary = 'Unable to generate summary.';
         }
@@ -54,25 +54,24 @@ class _BlogSummaryState extends State<BlogSummary> {
   }
 
   Future<void> speak() async {
-  if (isSpeaking) {
-    await flutterTts.stop();
-    setState(() => isSpeaking = false);
-  } else {
-    setState(() => isSpeaking = true);
-    try {
-      var result = await flutterTts.speak(summary);
-      if (result == 1) {
-        print("Speech started successfully");
-      } else {
-        print("Speech failed to start");
-      }
-    } catch (e) {
-      print("Error occurred during speech: $e");
-    } finally {
+    if (isSpeaking) {
+      await flutterTts.stop();
       setState(() => isSpeaking = false);
+    } else {
+      setState(() => isSpeaking = true);
+      try {
+        var result = await flutterTts.speak(summary);
+        if (result == 1) {
+        } else {
+          print("Speech failed to start");
+        }
+      } catch (e) {
+        print("Error occurred during speech: $e");
+      } finally {
+        setState(() => isSpeaking = false);
+      }
     }
   }
-}
 
   @override
   void dispose() {

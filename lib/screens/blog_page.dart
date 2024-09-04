@@ -7,6 +7,7 @@ import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/widgets/comment_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -36,13 +37,43 @@ var isSaved = false;
 
 class _BlogPageState extends State<BlogPage> {
   final TextEditingController _commentController = TextEditingController();
-  List<dynamic> _comments = []; // Store the fetched comments here
+  List<dynamic> _comments = [];
+  final FlutterTts flutterTts = FlutterTts();
+  bool isSpeaking = false;
 
   @override
   void initState() {
     super.initState();
     _fetchAndSetComments();
-    ApiService(); // Fetch comments when the page loads
+    ApiService();
+    initTts();
+  }
+
+  Future<void> initTts() async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setSpeechRate(0.5);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setPitch(1.0);
+  }
+
+  Future<void> speak() async {
+    if (isSpeaking) {
+      await flutterTts.stop();
+      setState(() => isSpeaking = false);
+    } else {
+      setState(() => isSpeaking = true);
+      try {
+        var result = await flutterTts.speak(widget.body);
+        if (result == 1) {
+        } else {
+          print("Speech failed to start");
+        }
+      } catch (e) {
+        print("Error occurred during speech: $e");
+      } finally {
+        setState(() => isSpeaking = false);
+      }
+    }
   }
 
   Future<void> _fetchAndSetComments() async {
@@ -78,6 +109,12 @@ class _BlogPageState extends State<BlogPage> {
     } catch (e) {
       print('Error posting comment: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop();
+    super.dispose();
   }
 
   @override
@@ -176,10 +213,18 @@ class _BlogPageState extends State<BlogPage> {
                   const Spacer(),
                   Row(
                     children: [
-                      IconButton(onPressed: (){}, icon: const Icon(Icons.volume_up_rounded)),
+                      IconButton(
+                        onPressed: speak,
+                        icon: Icon(
+                            isSpeaking ? Icons.stop : Icons.volume_up_rounded),
+                        tooltip: isSpeaking ? 'Stop Reading' : 'Read Blog',
+                      ),
                       IconButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> BlogSummary(blogBody: widget.body,)));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) => BlogSummary(
+                                    blogBody: widget.body,
+                                  )));
                         },
                         icon: const Icon(Icons.smart_toy_outlined),
                         tooltip: 'Summarize',
