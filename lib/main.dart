@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
           ),
           
           textTheme: GoogleFonts.poppinsTextTheme()),
-          
+      debugShowCheckedModeBanner: false,
       home: Provider.of<UserProvider>(context).user.token.isEmpty? const LandingPage(): const HomeScreen(),
       // home: const VerifyOtp(email: 'nadeeemanas617@gmail.com',),
     );
