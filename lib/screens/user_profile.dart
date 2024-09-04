@@ -58,23 +58,44 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _viewFullScreenImage(BuildContext context, String imageUrl) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => Scaffold(
-        body: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Center(
-            child: Hero(
-              tag: 'profileImage',
-              child: Image.network(
-                '${Constants.url}$imageUrl',
-                fit: BoxFit.contain,
-              ),
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (context) => Scaffold(
+      appBar: AppBar(
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              // Handle the menu options here
+              _pickAndUploadImage();
+              setState(() {});
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                  value: 'Option 1',
+                  child: Text('Change Profile Picture'),
+                ),
+              ];
+            },
+            icon: const Icon(Icons.more_vert), // The icon to trigger the popup menu
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Center(
+          child: Hero(
+            tag: 'profileImage',
+            child: Image.network(
+              '${Constants.url}$imageUrl',
+              fit: BoxFit.contain,
             ),
           ),
         ),
       ),
-    ));
-  }
+    ),
+  ));
+}
+
 
   @override
   Widget build(BuildContext context) {

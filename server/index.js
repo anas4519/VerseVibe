@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 app.use(express.json())
 const PORT = process.env.PORT || 8000;
-mongoose.connect("mongodb://localhost:27017/versevibe").then((e) => console.log("MongoDB connected!")
+mongoose.connect(process.env.MONGO_URL).then((e) => console.log("MongoDB connected!")
 )
 // app.use(express.urlencoded({extended: true}))
 app.use(express.static(path.join(__dirname, 'public')));
