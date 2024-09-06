@@ -86,7 +86,7 @@ class _UserProfileState extends State<UserProfile> {
           child: Hero(
             tag: 'profileImage',
             child: Image.network(
-              '${Constants.url}$imageUrl',
+              '${Constants.imageurl}$imageUrl',
               fit: BoxFit.contain,
             ),
           ),
@@ -147,7 +147,7 @@ class _UserProfileState extends State<UserProfile> {
                             backgroundColor: Constants.yellow,
                             backgroundImage: user.profileImageURL != null
                                 ? NetworkImage(
-                                    '${Constants.url}${user.profileImageURL!}')
+                                    '${Constants.imageurl}${user.profileImageURL!}')
                                 : null,
                             child: user.profileImageURL == null
                                 ? IconButton(

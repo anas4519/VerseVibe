@@ -129,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               BlogCard(
                                 coverImage: Image.network(
-                                    '${Constants.url}images${blog.coverImage}'),
+                                    '${Constants.imageurl}/images${blog.coverImage}'),
                                 author: blog.author,
                                 date: blog.date,
                                 profileImage: Image.asset('name'),

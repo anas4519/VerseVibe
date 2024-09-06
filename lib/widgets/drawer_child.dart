@@ -20,6 +20,7 @@ class DrawerChild extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.height;
     final user = Provider.of<UserProvider>(context, listen: false).user;
     void _viewFullScreenImage(BuildContext context, String imageUrl) {
+      print(imageUrl);
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
           body: GestureDetector(
@@ -28,7 +29,7 @@ class DrawerChild extends StatelessWidget {
               child: Hero(
                 tag: 'profileImage',
                 child: Image.network(
-                  '${Constants.url}$imageUrl',
+                  '${Constants.imageurl}$imageUrl',
                   fit: BoxFit.contain,
                 ),
               ),

@@ -125,35 +125,35 @@ class _BlogPageState extends State<BlogPage> {
 
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  isLiked = !isLiked;
-                });
-              },
-              icon: isLiked
-                  ? const Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    )
-                  : const Icon(Icons.favorite_border)),
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  if (!isSaved) {
-                    showSnackBar(context, 'Blog Added to Favourites!');
-                    isSaved = true;
-                  } else {
-                    showSnackBar(context, 'Blog Removed from Favourites.');
-                    isSaved = false;
-                  }
-                });
-              },
-              icon: isSaved
-                  ? const Icon(Icons.bookmark)
-                  : const Icon(Icons.bookmark_border))
-        ],
+        // actions: [
+        //   IconButton(
+        //       onPressed: () {
+        //         setState(() {
+        //           isLiked = !isLiked;
+        //         });
+        //       },
+        //       icon: isLiked
+        //           ? const Icon(
+        //               Icons.favorite,
+        //               color: Colors.red,
+        //             )
+        //           : const Icon(Icons.favorite_border)),
+        //   IconButton(
+        //       onPressed: () {
+        //         setState(() {
+        //           if (!isSaved) {
+        //             showSnackBar(context, 'Blog Added to Favourites!');
+        //             isSaved = true;
+        //           } else {
+        //             showSnackBar(context, 'Blog Removed from Favourites.');
+        //             isSaved = false;
+        //           }
+        //         });
+        //       },
+        //       icon: isSaved
+        //           ? const Icon(Icons.bookmark)
+        //           : const Icon(Icons.bookmark_border))
+        // ],
       ),
       body: SingleChildScrollView(
         child: Padding(
