@@ -3,6 +3,7 @@ import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/widgets/blog.dart';
 import 'package:blogs_app/widgets/drawer_child.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/screens/new_blog.dart';
@@ -56,21 +57,23 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.all(screenWidth*0.02),
+            padding: EdgeInsets.all(screenWidth * 0.02),
             child: GestureDetector(
-              onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (ctx) => const UserProfile()));
-              },
-              child: CircleAvatar(
-                radius: 30,
-                backgroundColor: Constants.yellow,
-                backgroundImage: user.profileImageURL != null
-                    ? NetworkImage('${Constants.url}${user.profileImageURL!}')
-                    : null,
-                child: user.profileImageURL == null ? const Icon(Icons.person) : null,
-              ),
-            ),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const UserProfile()));
+                },
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Constants.yellow,
+                  backgroundImage: user.profileImageURL != null
+                      ? CachedNetworkImageProvider(
+                          '${Constants.imageurl}${user.profileImageURL!}')
+                      : null,
+                  child: user.profileImageURL == null
+                      ? const Icon(Icons.person)
+                      : null,
+                )),
           )
         ],
       ),

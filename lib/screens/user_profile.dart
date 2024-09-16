@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:blogs_app/utils/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/models/blog_model.dart';
@@ -50,6 +51,9 @@ class _UserProfileState extends State<UserProfile> {
             (responseJson['imageUrl']);
         showSnackBar(context, 'Profile image updated successfully');
       } else {
+        final responseData = await http.Response.fromStream(response);
+        final responseJson = jsonDecode(responseData.body);
+        print(responseJson);
         showSnackBar(context, 'Failed to upload image');
       }
     } catch (e) {
@@ -58,44 +62,48 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _viewFullScreenImage(BuildContext context, String imageUrl) {
-  Navigator.of(context).push(MaterialPageRoute(
-    builder: (context) => Scaffold(
-      appBar: AppBar(
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              // Handle the menu options here
-              _pickAndUploadImage();
-              setState(() {});
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem(
-                  value: 'Option 1',
-                  child: Text('Change Profile Picture'),
-                ),
-              ];
-            },
-            icon: const Icon(Icons.more_vert), // The icon to trigger the popup menu
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
-        child: Center(
-          child: Hero(
-            tag: 'profileImage',
-            child: Image.network(
-              '${Constants.imageurl}$imageUrl',
-              fit: BoxFit.contain,
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                // Handle the menu options here
+                _pickAndUploadImage();
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  const PopupMenuItem(
+                    value: 'Option 1',
+                    child: Text('Change Profile Picture'),
+                  ),
+                ];
+              },
+              icon: const Icon(
+                  Icons.more_vert), // The icon to trigger the popup menu
+            ),
+          ],
+        ),
+        body: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Center(
+            child: Hero(
+              tag: 'profileImage',
+              child: CachedNetworkImage(
+                imageUrl: '${Constants.imageurl}$imageUrl',
+                fit: BoxFit.contain,
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(), // Optional: A loading indicator
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.error), // Optional: Error icon
+              ),
             ),
           ),
         ),
       ),
-    ),
-  ));
-}
-
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,25 +146,25 @@ class _UserProfileState extends State<UserProfile> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          onTap: user.profileImageURL != null
-                              ? () =>
-                                  _viewFullScreenImage(context, user.profileImageURL!)
-                              : null,
-                          child: CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Constants.yellow,
-                            backgroundImage: user.profileImageURL != null
-                                ? NetworkImage(
-                                    '${Constants.imageurl}${user.profileImageURL!}')
+                            onTap: user.profileImageURL != null
+                                ? () => _viewFullScreenImage(
+                                    context, user.profileImageURL!)
                                 : null,
-                            child: user.profileImageURL == null
-                                ? IconButton(
-                                    icon: const Icon(Icons.camera_alt_outlined),
-                                    onPressed: _pickAndUploadImage,
-                                  )
-                                : null,
-                          ),
-                        )
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Constants.yellow,
+                              backgroundImage: user.profileImageURL != null
+                                  ? CachedNetworkImageProvider(
+                                      '${Constants.imageurl}${user.profileImageURL!}')
+                                  : null,
+                              child: user.profileImageURL == null
+                                  ? IconButton(
+                                      icon:
+                                          const Icon(Icons.camera_alt_outlined),
+                                      onPressed: _pickAndUploadImage,
+                                    )
+                                  : null,
+                            ))
                       ],
                     ),
                     // SizedBox(height: screenHeight*0.04,),

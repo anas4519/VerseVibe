@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/blog_model.dart';
 
 class ApiService {
-  final String baseUrl = 'https://versevibe.onrender.com'; // Your API base URL
+  final String baseUrl = 'http://3.109.192.236:3000'; // Your API base URL
 
   Future<List<Blog>> fetchBlogs() async {
     final response = await http.get(Uri.parse('$baseUrl/blogs'));

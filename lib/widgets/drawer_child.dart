@@ -4,6 +4,7 @@ import 'package:blogs_app/screens/gemini_screen.dart';
 import 'package:blogs_app/screens/new_blog.dart';
 import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/auth_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class DrawerChild extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.height;
     final user = Provider.of<UserProvider>(context, listen: false).user;
     void _viewFullScreenImage(BuildContext context, String imageUrl) {
-      print(imageUrl);
+      print('${Constants.imageurl}$imageUrl');
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
           body: GestureDetector(
@@ -28,10 +29,17 @@ class DrawerChild extends StatelessWidget {
             child: Center(
               child: Hero(
                 tag: 'profileImage',
-                child: Image.network(
-                  '${Constants.imageurl}$imageUrl',
+                child: CachedNetworkImage(
+                  imageUrl: '${Constants.imageurl}$imageUrl',
                   fit: BoxFit.contain,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
+                // child: Image.network(
+                //   '${Constants.imageurl}$imageUrl',
+                //   fit: BoxFit.contain,
+                // ),
               ),
             ),
           ),
@@ -48,18 +56,20 @@ class DrawerChild extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: user.profileImageURL != null
-                ? () => _viewFullScreenImage(context, user.profileImageURL!)
-                : null,
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: Constants.yellow,
-              backgroundImage: user.profileImageURL != null
-                  ? NetworkImage('${Constants.url}${user.profileImageURL!}')
+              onTap: user.profileImageURL != null
+                  ? () => _viewFullScreenImage(context, user.profileImageURL!)
                   : null,
-              child: user.profileImageURL == null ? const Icon(Icons.person) : null,
-            ),
-          ),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Constants.yellow,
+                backgroundImage: user.profileImageURL != null
+                    ? CachedNetworkImageProvider(
+                        '${Constants.imageurl}${user.profileImageURL!}')
+                    : null,
+                child: user.profileImageURL == null
+                    ? const Icon(Icons.person)
+                    : null,
+              )),
           SizedBox(
             height: screenHeight * 0.01,
           ),
@@ -105,10 +115,9 @@ class DrawerChild extends StatelessWidget {
                   .push(MaterialPageRoute(builder: ((ctx) => const NewBlog())));
             },
           ),
-
           ListTile(
             leading: Icon(
-             Icons.smart_toy_outlined,
+              Icons.smart_toy_outlined,
               color: Constants.yellow,
             ),
             // leading: Text('AI', style: TextStyle(color: Constants.yellow, fontSize: 18)),
@@ -117,11 +126,10 @@ class DrawerChild extends StatelessWidget {
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: ((ctx) => const GeminiScreen())));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((ctx) => const GeminiScreen())));
             },
           ),
-
           ListTile(
             leading: Icon(
               Icons.person,
