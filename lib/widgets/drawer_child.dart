@@ -2,6 +2,7 @@ import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/gemini_screen.dart';
 import 'package:blogs_app/screens/new_blog.dart';
+import 'package:blogs_app/screens/saved_blogs.dart';
 import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/auth_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -100,6 +101,20 @@ class DrawerChild extends StatelessWidget {
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             onTap: Navigator.of(context).pop,
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.bookmark,
+              color: Constants.yellow,
+            ),
+            title: const Text(
+              'Saved Blogs',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const SavedBlogs()));
+            },
           ),
           ListTile(
             leading: Icon(

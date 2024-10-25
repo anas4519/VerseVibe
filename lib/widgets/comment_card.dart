@@ -11,6 +11,7 @@ class CommentCard extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start, // Aligns content at the top
       children: [
         CircleAvatar(
           backgroundColor: Constants.yellow,
@@ -20,16 +21,26 @@ class CommentCard extends StatelessWidget {
             size: 35,
           ),
         ),
-        SizedBox(width: screenWidth*0.03,),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(name, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),),
-            SizedBox(height: screenHeight*0.005,),
-            Text(body, style: const TextStyle(color: Colors.white, fontSize: 18)),
-          ],
-        )
+        SizedBox(width: screenWidth * 0.03),
+        Expanded( // Allows the Column to take up the remaining space
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: screenHeight * 0.005),
+              Text(
+                body,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+                maxLines: null, // Allows the text to wrap to multiple lines
+                overflow: TextOverflow.visible, // Ensures it doesn’t get cut off
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

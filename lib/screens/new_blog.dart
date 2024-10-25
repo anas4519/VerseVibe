@@ -21,12 +21,11 @@ class _NewBlogState extends State<NewBlog> {
   final _bodyController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
-  
 
   Future<void> postData(
       String title, String body, XFile image, BuildContext context) async {
-    final url = Uri.parse(
-        '${Constants.url}blogs/'); // Replace with your actual URL
+    final url =
+        Uri.parse('${Constants.url}blogs/'); // Replace with your actual URL
 
     try {
       var request = http.MultipartRequest('POST', url);
@@ -35,7 +34,7 @@ class _NewBlogState extends State<NewBlog> {
       request.fields['title'] = title;
       request.fields['body'] = body;
       request.fields['user_id'] = user.id;
-      
+
       // Add the image file to the request
       var stream = http.ByteStream(image.openRead());
       stream.cast();
@@ -76,6 +75,8 @@ class _NewBlogState extends State<NewBlog> {
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -96,6 +97,8 @@ class _NewBlogState extends State<NewBlog> {
               children: [
                 TextFormField(
                   controller: _titleController,
+                  cursorColor: Constants.yellow,
+                  maxLines: null,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelStyle: const TextStyle(color: Colors.white),
@@ -130,6 +133,7 @@ class _NewBlogState extends State<NewBlog> {
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                   child: TextFormField(
                     controller: _bodyController,
+                    cursorColor: Constants.yellow,
                     maxLines: null,
                     style: const TextStyle(color: Colors.white),
                     expands: true,
@@ -146,7 +150,7 @@ class _NewBlogState extends State<NewBlog> {
                       return null;
                     },
                   ),
-                ),
+                ),                
                 SizedBox(height: screenHeight * 0.02),
                 Container(
                   height: screenHeight * 0.2,

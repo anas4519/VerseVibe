@@ -6,11 +6,14 @@ import 'package:blogs_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   Gemini.init(apiKey: Constants.GEMINI_API_KEY);
+    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
       child: const MyApp()));
@@ -27,8 +30,19 @@ class _MyAppState extends State<MyApp> {
   final AuthService authService = AuthService();
   @override
   void initState() {
-    authService.getUserData(context);
     super.initState();
+    _initApp();
+  }
+
+  Future<void> _initApp() async {
+    try {
+      await authService.getUserData(context);
+    } catch (e) {
+      print("Error fetching user data: $e");
+    } finally {
+      FlutterNativeSplash
+          .remove(); // Ensure splash screen is removed in case of errors
+    }
   }
 
   @override
@@ -47,6 +61,7 @@ class _MyAppState extends State<MyApp> {
             color: Constants.appBar,
             foregroundColor: Colors.white
           ),
+          
           
           textTheme: GoogleFonts.poppinsTextTheme()),
       debugShowCheckedModeBanner: false,

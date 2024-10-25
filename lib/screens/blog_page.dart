@@ -6,11 +6,13 @@ import 'package:blogs_app/screens/blog_Summary.dart';
 import 'package:blogs_app/services/api_services.dart';
 import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/widgets/comment_card.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BlogPage extends StatefulWidget {
   const BlogPage(
@@ -22,7 +24,7 @@ class BlogPage extends StatefulWidget {
       required this.title,
       required this.blog_id});
   final String body;
-  final Image coverImage;
+  final String coverImage;
   final String author;
   final DateTime date;
   final String title;
@@ -44,6 +46,7 @@ class _BlogPageState extends State<BlogPage> {
   @override
   void initState() {
     super.initState();
+    _loadBookmarkStatus();
     _fetchAndSetComments();
     ApiService();
     initTts();
@@ -117,6 +120,32 @@ class _BlogPageState extends State<BlogPage> {
     super.dispose();
   }
 
+  Future<void> _loadBookmarkStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> bookmarkedBlogs = prefs.getStringList('bookmarkedBlogs') ?? [];
+    setState(() {
+      isSaved = bookmarkedBlogs.contains(widget.blog_id);
+    });
+  }
+
+  Future<void> _toggleBookmark() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> bookmarkedBlogs = prefs.getStringList('bookmarkedBlogs') ?? [];
+
+    if (isSaved) {
+      // Remove from bookmarks
+      bookmarkedBlogs.remove(widget.blog_id);
+    } else {
+      // Add to bookmarks
+      bookmarkedBlogs.add(widget.blog_id);
+    }
+
+    await prefs.setStringList('bookmarkedBlogs', bookmarkedBlogs);
+    setState(() {
+      isSaved = !isSaved;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -125,35 +154,18 @@ class _BlogPageState extends State<BlogPage> {
 
     return Scaffold(
       appBar: AppBar(
-        // actions: [
-        //   IconButton(
-        //       onPressed: () {
-        //         setState(() {
-        //           isLiked = !isLiked;
-        //         });
-        //       },
-        //       icon: isLiked
-        //           ? const Icon(
-        //               Icons.favorite,
-        //               color: Colors.red,
-        //             )
-        //           : const Icon(Icons.favorite_border)),
-        //   IconButton(
-        //       onPressed: () {
-        //         setState(() {
-        //           if (!isSaved) {
-        //             showSnackBar(context, 'Blog Added to Favourites!');
-        //             isSaved = true;
-        //           } else {
-        //             showSnackBar(context, 'Blog Removed from Favourites.');
-        //             isSaved = false;
-        //           }
-        //         });
-        //       },
-        //       icon: isSaved
-        //           ? const Icon(Icons.bookmark)
-        //           : const Icon(Icons.bookmark_border))
-        // ],
+        actions: [
+          IconButton(
+            icon: Icon(
+              isSaved ? Icons.bookmark : Icons.bookmark_border,
+              color: Constants.yellow,
+            ),
+            onPressed: () {
+              // Handle bookmark button press
+              _toggleBookmark();
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -167,11 +179,23 @@ class _BlogPageState extends State<BlogPage> {
                   width: screenWidth * 0.9,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(screenWidth * 0.04),
-                    image: DecorationImage(
-                        image: widget.coverImage.image, fit: BoxFit.cover),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                        screenWidth * 0.04), // Apply the same borderRadius
+                    child: CachedNetworkImage(
+                      imageUrl: widget.coverImage,
+                      fit: BoxFit
+                          .cover, // Ensures the image covers the container properly
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.image,
+                        color: Constants.yellow,
+                      ),
+                    ),
                   ),
                 ),
               ),
+
               SizedBox(
                 height: screenHeight * 0.01,
               ),
@@ -197,12 +221,7 @@ class _BlogPageState extends State<BlogPage> {
               // ),
               Row(
                 children: [
-                  Image.asset(
-                    'assets/image.png',
-                    height: 20,
-                    width: 20,
-                    fit: BoxFit.cover,
-                  ),
+                  const Icon(Icons.person),
                   SizedBox(
                     width: screenWidth * 0.02,
                   ),
@@ -263,7 +282,7 @@ class _BlogPageState extends State<BlogPage> {
                     radius: 30,
                     backgroundColor: Constants.yellow,
                     backgroundImage: user.profileImageURL != null
-                        ? NetworkImage(
+                        ? CachedNetworkImageProvider(
                             '${Constants.url}${user.profileImageURL!}')
                         : null,
                     child: user.profileImageURL == null

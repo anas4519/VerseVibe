@@ -1,6 +1,7 @@
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/user_profile.dart';
 import 'package:blogs_app/services/api_services.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/widgets/blog.dart';
 import 'package:blogs_app/widgets/drawer_child.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,8 +12,17 @@ import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/models/blog_model.dart';
 import 'package:provider/provider.dart'; // Ensure this import is correct // Ensure this import is correct
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Future<void> _refresh() async {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,80 +89,88 @@ class HomeScreen extends StatelessWidget {
       ),
       drawer: Drawer(
         backgroundColor: Constants.bg,
-        child: DrawerChild(),
-        // child: Center(
-        //   child: IconButton(
-        //     onPressed: () => signOut(context),
-        //     icon: const Icon(Icons.logout, color: Colors.white),
-        //   ),
-        // ),
+        child: const DrawerChild(),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(screenWidth * 0.04),
-              child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Explore',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  )),
-            ),
-            FutureBuilder<List<Blog>>(
-              future: ApiService()
-                  .fetchBlogs(), // Ensure this returns Future<List<Blog>>
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                      child: CircularProgressIndicator(
-                    color: Constants.yellow,
-                  ));
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
+      body: LayoutBuilder(builder: (context, constraints) {
+        return RefreshIndicator(
+          onRefresh: _refresh,
+          color: Constants.yellow,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.04),
+                  child: const Align(
+                      alignment: Alignment.centerLeft,
                       child: Text(
-                    'No blogs available.',
-                    style: TextStyle(color: Colors.white),
-                  ));
-                } else {
-                  final blogs = snapshot.data!;
-                  return SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.04),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: blogs.map((blog) {
-                          return Column(
+                        'Explore',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                      )),
+                ),
+                FutureBuilder<List<Blog>>(
+                  future: ApiService()
+                      .fetchBlogs(), // Ensure this returns Future<List<Blog>>
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                          child: CircularProgressIndicator(
+                        color: Constants.yellow,
+                      ));
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                          child: Text(
+                        'No blogs available.',
+                        style: TextStyle(color: Colors.white),
+                      ));
+                    } else {
+                      final blogs = snapshot.data!;
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(screenWidth * 0.04),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              BlogCard(
-                                coverImage: Image.network(
-                                    '${Constants.imageurl}/images${blog.coverImage}'),
-                                author: blog.author,
-                                date: blog.date,
-                                profileImage: Image.asset('name'),
-                                title: blog.title,
-                                body: blog.body,
-                                id: blog.id,
-                              ),
-                              SizedBox(height: screenHeight * 0.02),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  );
-                }
-              },
+                            children: blogs.map((blog) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  BlogCard(
+                                    coverImage:
+                                        '${Constants.imageurl}/images${blog.coverImage}',
+                                    author: blog.author,
+                                    date: blog.date,
+                                    profileImage: Image.asset('name'),
+                                    title: blog.title,
+                                    body: blog.body,
+                                    id: blog.id,
+                                    selfBlog: false,
+                                    onDelete: () {
+                                      setState(() {});
+                                    },
+                                    onEdited: () {
+                                      showSnackBar(
+                                          context, 'Blog added to Favourites!');
+                                    },
+                                  ),
+                                  SizedBox(height: screenHeight * 0.02),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }),
     );
   }
 }

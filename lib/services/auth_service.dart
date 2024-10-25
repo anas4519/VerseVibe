@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/landing/landingPage.dart';
 import 'package:blogs_app/providers/user_provider.dart';
-import 'package:blogs_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  void getUserData(
+  Future<void> getUserData(
     BuildContext context,
   ) async {
     try {
@@ -40,11 +39,10 @@ class AuthService {
             'x-auth-token': token
           },
         );
-        print(userRes.body);
         userProvider.setUser(userRes.body);
       }
     } catch (e) {
-      showSnackBar(context, e.toString());
+      print(e.toString());
     }
   }
 

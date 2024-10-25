@@ -1,6 +1,7 @@
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/providers/user_provider.dart';
 import 'package:blogs_app/screens/home_screen.dart';
+import 'package:blogs_app/screens/password_reset/forgot_password1.dart';
 import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/sheets/register_sheet.dart';
 import 'package:flutter/material.dart';
@@ -222,7 +223,9 @@ class _LoginSheetState extends State<LoginSheet> {
                   const Spacer(),
                   InkWell(
                     child: const Text('Forgot Password?'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> const ForgotPassword1()));
+                    },
                   )
                 ],
               ),

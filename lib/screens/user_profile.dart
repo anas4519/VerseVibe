@@ -22,6 +22,10 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   final ImagePicker _picker = ImagePicker();
 
+  Future<void> _refresh() async {
+    setState(() {});
+  }
+
   Future<void> _pickAndUploadImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
@@ -96,7 +100,7 @@ class _UserProfileState extends State<UserProfile> {
                 placeholder: (context, url) =>
                     const CircularProgressIndicator(), // Optional: A loading indicator
                 errorWidget: (context, url, error) =>
-                    const Icon(Icons.error), // Optional: Error icon
+                    const Icon(Icons.person), // Optional: Error icon
               ),
             ),
           ),
@@ -111,143 +115,149 @@ class _UserProfileState extends State<UserProfile> {
     final screenHeight = MediaQuery.of(context).size.height;
     final user = Provider.of<UserProvider>(context, listen: false).user;
     return Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18),
+                          ),
+                          Text(
+                            user.email,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 8),
+                          ),
+                          Text('User id : ${user.id}',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 8))
+                        ],
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                          onTap: user.profileImageURL != null
+                              ? () => _viewFullScreenImage(
+                                  context, user.profileImageURL!)
+                              : null,
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Constants.yellow,
+                            backgroundImage: user.profileImageURL != null
+                                ? CachedNetworkImageProvider(
+                                    '${Constants.imageurl}${user.profileImageURL!}')
+                                : null,
+                            child: user.profileImageURL == null
+                                ? IconButton(
+                                    icon: const Icon(Icons.camera_alt_outlined),
+                                    onPressed: _pickAndUploadImage,
+                                  )
+                                : null,
+                          ))
+                    ],
+                  ),
+                  // SizedBox(height: screenHeight*0.04,),
+                  // const Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //   children: [
+                  //     const Text('35.2 Blogs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
+                  //     const Text('158 Likes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
+                  //     const Text('12.5 Comments', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
+
+                  //   ],
+                  // ),
+                  SizedBox(
+                    height: screenHeight * 0.01,
+                  ),
+                  const Divider(
+                    color: Colors.grey,
+                  ),
+                  const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Your Blogs',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                      )),
+                ],
+              ),
+            ),
+            FutureBuilder<List<Blog>>(
+              future: ApiService().fetchUserBlogs(
+                Provider.of<UserProvider>(context, listen: false).user.id,
+              ), // Ensure this returns Future<List<Blog>>
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: Constants.yellow,
+                  ));
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                      child: Text(
+                    'No blogs available.',
+                    style: TextStyle(color: Colors.white),
+                  ));
+                } else {
+                  final blogs = snapshot.data!;
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: screenWidth * 0.04, right: screenWidth * 0.04),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: blogs.map((blog) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              BlogCard(
+                                coverImage:
+                                    '${Constants.url}images${blog.coverImage}',
+                                author: blog.author,
+                                date: blog.date,
+                                profileImage: Image.asset('name'),
+                                title: blog.title,
+                                body: blog.body,
+                                id: blog.id,
+                                selfBlog: true,
+                                onDelete: () {
+                                  setState(() {});
+                                },
+                                onEdited: () {
+                                      setState(() {});
+                                    },
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(screenWidth * 0.04),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.name,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 18),
-                            ),
-                            Text(
-                              user.email,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 8),
-                            ),
-                            Text('User id : ${user.id}',
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 8))
-                          ],
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                            onTap: user.profileImageURL != null
-                                ? () => _viewFullScreenImage(
-                                    context, user.profileImageURL!)
-                                : null,
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Constants.yellow,
-                              backgroundImage: user.profileImageURL != null
-                                  ? CachedNetworkImageProvider(
-                                      '${Constants.imageurl}${user.profileImageURL!}')
-                                  : null,
-                              child: user.profileImageURL == null
-                                  ? IconButton(
-                                      icon:
-                                          const Icon(Icons.camera_alt_outlined),
-                                      onPressed: _pickAndUploadImage,
-                                    )
-                                  : null,
-                            ))
-                      ],
-                    ),
-                    // SizedBox(height: screenHeight*0.04,),
-                    // const Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    //   children: [
-                    //     const Text('35.2 Blogs', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
-                    //     const Text('158 Likes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
-                    //     const Text('12.5 Comments', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
-
-                    //   ],
-                    // ),
-                    SizedBox(
-                      height: screenHeight * 0.01,
-                    ),
-                    const Divider(
-                      color: Colors.grey,
-                    ),
-                    const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Your Blogs',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
-                        )),
-                  ],
-                ),
-              ),
-              FutureBuilder<List<Blog>>(
-                future: ApiService().fetchUserBlogs(
-                  Provider.of<UserProvider>(context, listen: false).user.id,
-                ), // Ensure this returns Future<List<Blog>>
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: Constants.yellow,
-                    ));
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text(
-                      'No blogs available.',
-                      style: TextStyle(color: Colors.white),
-                    ));
-                  } else {
-                    final blogs = snapshot.data!;
-                    return SingleChildScrollView(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            left: screenWidth * 0.04,
-                            right: screenWidth * 0.04),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: blogs.map((blog) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                BlogCard(
-                                  coverImage: Image.network(
-                                      '${Constants.url}images${blog.coverImage}'),
-                                  author: blog.author,
-                                  date: blog.date,
-                                  profileImage: Image.asset('name'),
-                                  title: blog.title,
-                                  body: blog.body,
-                                  id: blog.id,
-                                ),
-                                SizedBox(height: screenHeight * 0.02),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 }
