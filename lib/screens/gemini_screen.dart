@@ -33,7 +33,7 @@ class _GeminiScreenState extends State<GeminiScreen> {
         currentUser = ChatUser(
             id: user.id,
             firstName: user.name,
-            profileImage: '${Constants.url}${user.profileImageURL}');
+            profileImage: user.profileImageURL);
       });
     });
   }

@@ -86,8 +86,15 @@ class _BlogCardState extends State<BlogCard> {
     );
 
     if (response.statusCode == 200) {
-      // Optionally, show a success message
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String>? bookmarkedBlogs =
+          prefs.getStringList('bookmarkedBlogs') ?? [];
+      if (bookmarkedBlogs.contains(id)) {
+        bookmarkedBlogs.remove(id);
+        await prefs.setStringList('bookmarkedBlogs', bookmarkedBlogs);
+      }
       showSnackBar(context, 'Blog deleted successfully!');
+
       Navigator.of(context).pop();
       widget.onDelete();
     } else {

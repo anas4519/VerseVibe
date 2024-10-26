@@ -77,8 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   radius: 30,
                   backgroundColor: Constants.yellow,
                   backgroundImage: user.profileImageURL != null
-                      ? CachedNetworkImageProvider(
-                          '${Constants.imageurl}${user.profileImageURL!}')
+                      ? CachedNetworkImageProvider(user.profileImageURL!)
                       : null,
                   child: user.profileImageURL == null
                       ? const Icon(Icons.person)
@@ -139,8 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   BlogCard(
-                                    coverImage:
-                                        '${Constants.imageurl}/images${blog.coverImage}',
+                                    coverImage: blog.coverImage,
                                     author: blog.author,
                                     date: blog.date,
                                     profileImage: Image.asset('name'),

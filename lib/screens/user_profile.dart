@@ -95,7 +95,7 @@ class _UserProfileState extends State<UserProfile> {
             child: Hero(
               tag: 'profileImage',
               child: CachedNetworkImage(
-                imageUrl: '${Constants.imageurl}$imageUrl',
+                imageUrl: imageUrl,
                 fit: BoxFit.contain,
                 placeholder: (context, url) =>
                     const CircularProgressIndicator(), // Optional: A loading indicator
@@ -159,7 +159,7 @@ class _UserProfileState extends State<UserProfile> {
                             backgroundColor: Constants.yellow,
                             backgroundImage: user.profileImageURL != null
                                 ? CachedNetworkImageProvider(
-                                    '${Constants.imageurl}${user.profileImageURL!}')
+                                    user.profileImageURL!)
                                 : null,
                             child: user.profileImageURL == null
                                 ? IconButton(
@@ -229,8 +229,7 @@ class _UserProfileState extends State<UserProfile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               BlogCard(
-                                coverImage:
-                                    '${Constants.url}images${blog.coverImage}',
+                                coverImage: blog.coverImage,
                                 author: blog.author,
                                 date: blog.date,
                                 profileImage: Image.asset('name'),
@@ -242,8 +241,8 @@ class _UserProfileState extends State<UserProfile> {
                                   setState(() {});
                                 },
                                 onEdited: () {
-                                      setState(() {});
-                                    },
+                                  setState(() {});
+                                },
                               ),
                               SizedBox(height: screenHeight * 0.02),
                             ],

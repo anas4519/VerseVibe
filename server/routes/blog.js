@@ -6,18 +6,27 @@ const { User } = require("../models/user");
 const { Comment } = require("../models/comment");
 const { log } = require("console");
 const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config()
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(`./public/images/uploads/`));
-  },
-  filename: function (req, file, cb) {
-    const fileName = `${Date.now()}-${file.originalname}`;
-    cb(null, fileName);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Set up Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "uploads", // Cloudinary folder for cover images
+    format: async (req, file) => "png", // Optional: specify the format
+    public_id: (req, file) => Date.now() + "-" + file.originalname,
   },
 });
 
-const upload = multer({ storage: storage }); // Corrected the typo here
+const upload = multer({ storage: storage });
 
 const router = Router();
 router.post("/", upload.single("coverImage"), async (req, res) => {
@@ -35,12 +44,12 @@ router.post("/", upload.single("coverImage"), async (req, res) => {
       title,
       body,
       createdBy: user._id,
-      coverImageURL: `/uploads/${req.file.filename}`,
+      coverImageURL: req.file.path, // Cloudinary URL
     });
 
     return res.json({ success: true, blog });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating blog:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to create blog" });
@@ -156,7 +165,7 @@ router.patch("/:id", async (req, res) => {
 
 router.post("/getBlogsByIds", async (req, res) => {
   try {
-    const { ids } = req.body;    
+    const { ids } = req.body;
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ message: "No blog IDs provided." });
     }

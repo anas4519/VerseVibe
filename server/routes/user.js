@@ -6,6 +6,14 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const multer = require("multer");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -45,7 +53,6 @@ router.post("/tokenIsValid", async (req, res) => {
     if (!verified) return res.json(false);
     const userId = verified._id;
     const user = await User.findById(userId);
-    console.log(user.profileImageURL);
 
     if (!user) return res.json(false);
     return res.json(true);
@@ -67,8 +74,6 @@ router.get("/", auth, async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  console.log("Recieved");
-
   try {
     const { fullName, email, password } = req.body;
 
@@ -98,7 +103,6 @@ router.post("/signup", async (req, res) => {
         console.error("Error sending email:", error);
         return res.status(500).json({ status: "Failed to send OTP email" });
       } else {
-        console.log("OTP email sent: " + info.response);
         return res.json({ status: "OTP sent to email", email });
       }
     });
@@ -144,15 +148,15 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(`./public/images/profileImages/`));
-  },
-  filename: function (req, file, cb) {
-    const fileName = `${Date.now()}-${file.originalname}`;
-    cb(null, fileName);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "profileImages",
+    format: async (req, file) => "png", // Choose the format if necessary
+    public_id: (req, file) => Date.now() + "-" + file.originalname,
   },
 });
+
 const upload = multer({ storage: storage });
 
 router.post(
@@ -165,7 +169,8 @@ router.post(
       if (!file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-      const imageUrl = `/images/profileImages/${file.filename}`;
+
+      const imageUrl = file.path; // URL from Cloudinary
       const user = await User.findByIdAndUpdate(
         userId,
         { profileImageURL: imageUrl },
@@ -212,7 +217,6 @@ router.post("/generateOTPToChangePassword", async (req, res) => {
         console.error("Error sending email:", error);
         return res.status(500).json({ status: "Failed to send OTP email" });
       } else {
-        console.log("OTP email sent: " + info.response);
         return res.json({ status: "OTP sent to email", email });
       }
     });

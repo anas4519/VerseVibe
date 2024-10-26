@@ -31,7 +31,7 @@ class DrawerChild extends StatelessWidget {
               child: Hero(
                 tag: 'profileImage',
                 child: CachedNetworkImage(
-                  imageUrl: '${Constants.imageurl}$imageUrl',
+                  imageUrl: imageUrl,
                   fit: BoxFit.contain,
                   placeholder: (context, url) =>
                       const CircularProgressIndicator(),
@@ -64,8 +64,7 @@ class DrawerChild extends StatelessWidget {
                 radius: 30,
                 backgroundColor: Constants.yellow,
                 backgroundImage: user.profileImageURL != null
-                    ? CachedNetworkImageProvider(
-                        '${Constants.imageurl}${user.profileImageURL!}')
+                    ? CachedNetworkImageProvider(user.profileImageURL!)
                     : null,
                 child: user.profileImageURL == null
                     ? const Icon(Icons.person)

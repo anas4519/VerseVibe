@@ -101,12 +101,11 @@ class _SavedBlogsState extends State<SavedBlogs> {
                 return Column(
                   children: [
                     BlogCard(
-                      coverImage:
-                          '${Constants.imageurl}/images${blog['coverImageURL']}',
+                      coverImage: blog['coverImageURL'],
                       author: blog['createdBy'],
                       date: DateTime.parse(blog['createdAt']),
-                      profileImage:
-                          Image.asset('name'), // Adjust this based on your backend
+                      profileImage: Image.asset(
+                          'name'), // Adjust this based on your backend
                       title: blog['title'],
                       body: blog['body'],
                       id: blog['_id'],
@@ -114,7 +113,6 @@ class _SavedBlogsState extends State<SavedBlogs> {
                       onDelete: () {},
                       onEdited: () {
                         setState(() {});
-                        
                       },
                     ),
                     SizedBox(height: screenHeight * 0.02),
