@@ -23,7 +23,7 @@ class Blog {
       coverImage: json['coverImageURL'] ?? '',
       author: json['createdBy']['fullName'] ?? '', // Adjust this based on your API response
       date: DateTime.parse(json['createdAt']),
-      profileImage: json['profileImage'] ?? '', // Adjust this based on your API response
+      profileImage: json['createdBy']['profileImageURL'] ?? '', // Adjust this based on your API response
       title: json['title'] ?? '',
       body: json['body'] ?? '',
       id: json['_id'] ?? ' '

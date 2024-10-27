@@ -8,9 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/screens/new_blog.dart';
-import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/models/blog_model.dart';
-import 'package:provider/provider.dart'; // Ensure this import is correct // Ensure this import is correct
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,10 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    void signOut(BuildContext context) {
-      AuthService().signOut(context);
-    }
-
+    
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -141,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     coverImage: blog.coverImage,
                                     author: blog.author,
                                     date: blog.date,
-                                    profileImage: Image.asset('name'),
+                                    profileImage: blog.profileImage,
                                     title: blog.title,
                                     body: blog.body,
                                     id: blog.id,

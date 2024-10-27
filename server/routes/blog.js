@@ -8,7 +8,7 @@ const { log } = require("console");
 const fs = require("fs");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
-require("dotenv").config()
+require("dotenv").config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -60,7 +60,7 @@ router.get("/", async (req, res) => {
   try {
     const allBlogs = await Blog.find({})
       .sort({ createdAt: -1 })
-      .populate("createdBy", "fullName");
+      .populate("createdBy", "fullName profileImageURL");
     return res.json(allBlogs);
   } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -74,7 +74,7 @@ router.get("/user/:createdBy", async (req, res) => {
 
     const allBlogs = await Blog.find({ createdBy })
       .sort({ createdAt: -1 })
-      .populate("createdBy", "fullName");
+      .populate("createdBy", "fullName profileImageURL");
 
     return res.json(allBlogs);
   } catch (error) {
@@ -93,13 +93,19 @@ router.post("/comment/:blogId", async (req, res) => {
 });
 
 router.get("/comment/:id", async (req, res) => {
-  const comments = await Comment.find({ blogId: req.params.id })
-    .populate({
-      path: "createdBy",
-      select: "fullName", // Select only the fullName field
-    })
-    .sort({ createdAt: -1 });
-  return res.json(comments);
+  try {
+    const comments = await Comment.find({ blogId: req.params.id })
+      .populate({
+        path: "createdBy",
+        select: "fullName profileImageURL",
+      })
+      .sort({ createdAt: -1 });
+
+    return res.json(comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 router.delete("/:id", async (req, res) => {
@@ -112,27 +118,24 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ success: false });
     }
 
-    const imagePath = path.join(
-      __dirname,
-      `../public/images${blog.coverImageURL}`
-    );
+    // Delete the cover image from Cloudinary using the public ID
+    const coverImagePublicId = blog.coverImageURL
+      .split("/")
+      .slice(-2)
+      .join("/")
+      .replace(/\.[^/.]+$/, "");
 
-    fs.stat(imagePath, (err, stats) => {
-      if (err) {
-        if (err.code === "ENOENT") {
-          console.log("Image does not exist");
-        } else {
-          console.error("Error checking image existence:", err);
+    if (coverImagePublicId) {
+      await cloudinary.uploader.destroy(coverImagePublicId, (error, result) => {
+        if (error) {
+          console.error("Error deleting image from Cloudinary:", error);
         }
-      } else {
-        fs.unlink(imagePath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error("Error deleting image:", unlinkErr);
-          }
-        });
-      }
-    });
+      });
+    } else {
+      console.log("No cover image found for deletion on Cloudinary.");
+    }
 
+    // Delete the blog document from MongoDB
     await Blog.findByIdAndDelete(id);
 
     return res.json({ success: true });
@@ -170,16 +173,14 @@ router.post("/getBlogsByIds", async (req, res) => {
       return res.status(400).json({ message: "No blog IDs provided." });
     }
 
-    // Fetch blogs from MongoDB where the _id matches any of the provided IDs
     const blogs = await Blog.find({
       _id: { $in: ids },
-    });
+    }).populate("createdBy", "fullName profileImageURL");
 
     if (blogs.length === 0) {
       return res.status(404).json({ message: "No blogs found." });
     }
 
-    // Return the blogs as a response
     res.status(200).json(blogs);
   } catch (err) {
     console.error("Error fetching blogs:", err);

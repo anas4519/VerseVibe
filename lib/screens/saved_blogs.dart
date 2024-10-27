@@ -42,7 +42,6 @@ class _SavedBlogsState extends State<SavedBlogs> {
       );
       if (response.statusCode == 200) {
         final List<dynamic> blogDataList = json.decode(response.body);
-        print(blogDataList);
         setState(() {
           savedBlogs = blogDataList.cast<Map<String, dynamic>>();
         });
@@ -50,7 +49,7 @@ class _SavedBlogsState extends State<SavedBlogs> {
         print('Failed to load blogs.');
       }
     } catch (e) {
-      print('Error fetching blogs: $e');
+      print('Error fetching blogs');
     }
   }
 
@@ -102,10 +101,9 @@ class _SavedBlogsState extends State<SavedBlogs> {
                   children: [
                     BlogCard(
                       coverImage: blog['coverImageURL'],
-                      author: blog['createdBy'],
+                      author: blog['createdBy']['fullName'], // Extract author name
                       date: DateTime.parse(blog['createdAt']),
-                      profileImage: Image.asset(
-                          'name'), // Adjust this based on your backend
+                      profileImage: blog['createdBy']['profileImageURL'], // Extract profile image URL
                       title: blog['title'],
                       body: blog['body'],
                       id: blog['_id'],

@@ -22,13 +22,15 @@ class BlogPage extends StatefulWidget {
       required this.author,
       required this.date,
       required this.title,
-      required this.blog_id});
+      required this.blog_id,
+      required this.authorImage});
   final String body;
   final String coverImage;
   final String author;
   final DateTime date;
   final String title;
   final String blog_id;
+  final String authorImage;
 
   @override
   State<BlogPage> createState() => _BlogPageState();
@@ -42,6 +44,10 @@ class _BlogPageState extends State<BlogPage> {
   List<dynamic> _comments = [];
   final FlutterTts flutterTts = FlutterTts();
   bool isSpeaking = false;
+  bool isInitialized = false;
+
+  int currentChunk = 0;
+  List<String> textChunks = [];
 
   @override
   void initState() {
@@ -50,6 +56,31 @@ class _BlogPageState extends State<BlogPage> {
     _fetchAndSetComments();
     ApiService();
     initTts();
+    textChunks = _splitTextIntoChunks(widget.body);
+  }
+
+  List<String> _splitTextIntoChunks(String text) {
+    List<String> chunks = [];
+    // Split by sentences (roughly) and combine into ~1000 character chunks
+    final sentences = text.split(RegExp(r'(?<=[.!?])\s+'));
+    String currentChunk = '';
+
+    for (String sentence in sentences) {
+      if (currentChunk.length + sentence.length < 1000) {
+        currentChunk += sentence + ' ';
+      } else {
+        if (currentChunk.isNotEmpty) {
+          chunks.add(currentChunk.trim());
+        }
+        currentChunk = sentence + ' ';
+      }
+    }
+
+    if (currentChunk.isNotEmpty) {
+      chunks.add(currentChunk.trim());
+    }
+
+    return chunks;
   }
 
   Future<void> initTts() async {
@@ -57,24 +88,50 @@ class _BlogPageState extends State<BlogPage> {
     await flutterTts.setSpeechRate(0.5);
     await flutterTts.setVolume(1.0);
     await flutterTts.setPitch(1.0);
+
+    flutterTts.setCompletionHandler(() {
+      if (currentChunk < textChunks.length - 1) {
+        currentChunk++;
+        _speakCurrentChunk();
+      } else {
+        setState(() {
+          isSpeaking = false;
+          currentChunk = 0;
+        });
+      }
+    });
+
+    isInitialized = true;
+  }
+
+  Future<void> _speakCurrentChunk() async {
+    if (currentChunk < textChunks.length) {
+      await flutterTts.speak(textChunks[currentChunk]);
+    }
   }
 
   Future<void> speak() async {
+    if (!isInitialized) return;
+
     if (isSpeaking) {
       await flutterTts.stop();
-      setState(() => isSpeaking = false);
+      setState(() {
+        isSpeaking = false;
+        currentChunk = 0;
+      });
     } else {
-      setState(() => isSpeaking = true);
+      setState(() {
+        isSpeaking = true;
+        currentChunk = 0;
+      });
       try {
-        var result = await flutterTts.speak(widget.body);
-        if (result == 1) {
-        } else {
-          print("Speech failed to start");
-        }
+        await _speakCurrentChunk();
       } catch (e) {
         print("Error occurred during speech: $e");
-      } finally {
-        setState(() => isSpeaking = false);
+        setState(() {
+          isSpeaking = false;
+          currentChunk = 0;
+        });
       }
     }
   }
@@ -98,8 +155,7 @@ class _BlogPageState extends State<BlogPage> {
         },
         body: jsonEncode({
           'content': content,
-          'createdBy':
-              userId, // If you have the user ID, pass it here or handle it server-side
+          'createdBy': userId,
         }),
       );
 
@@ -221,7 +277,20 @@ class _BlogPageState extends State<BlogPage> {
               // ),
               Row(
                 children: [
-                  const Icon(Icons.person),
+                  CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Constants.bg,
+                    backgroundImage: widget.authorImage.isNotEmpty
+                        ? CachedNetworkImageProvider(widget.authorImage)
+                        : null,
+                    child: widget.authorImage.isEmpty
+                        ? const Icon(
+                            Icons.person,
+                            size: 20,
+                            color: Colors.white,
+                          )
+                        : null,
+                  ),
                   SizedBox(
                     width: screenWidth * 0.02,
                   ),
@@ -235,7 +304,8 @@ class _BlogPageState extends State<BlogPage> {
                       IconButton(
                         onPressed: speak,
                         icon: Icon(
-                            isSpeaking ? Icons.stop : Icons.volume_up_rounded),
+                          isSpeaking ? Icons.stop_circle : Icons.volume_up,
+                        ),
                         tooltip: isSpeaking ? 'Stop Reading' : 'Read Blog',
                       ),
                       IconButton(
@@ -282,8 +352,7 @@ class _BlogPageState extends State<BlogPage> {
                     radius: 30,
                     backgroundColor: Constants.yellow,
                     backgroundImage: user.profileImageURL != null
-                        ? CachedNetworkImageProvider(
-                            '${Constants.url}${user.profileImageURL!}')
+                        ? CachedNetworkImageProvider(user.profileImageURL!)
                         : null,
                     child: user.profileImageURL == null
                         ? const Icon(Icons.person)
@@ -372,12 +441,14 @@ class _BlogPageState extends State<BlogPage> {
                   final createdBy = comment['createdBy'] ?? {}; // Handle null
                   final name = createdBy['fullName'] ??
                       'Unknown'; // Provide a default name
+                  final image = createdBy['profileImageURL'] ?? '';
                   return Column(
                     children: [
                       CommentCard(
-                        body: comment['content'] ?? 'No content', // Handle null
-                        name: name,
-                      ),
+                          body:
+                              comment['content'] ?? 'No content', // Handle null
+                          name: name,
+                          image: image),
                       SizedBox(
                         height: screenHeight * 0.02,
                       )

@@ -115,11 +115,7 @@ class _UserProfileState extends State<UserProfile> {
     final screenHeight = MediaQuery.of(context).size.height;
     final user = Provider.of<UserProvider>(context, listen: false).user;
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
-        ],
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +228,7 @@ class _UserProfileState extends State<UserProfile> {
                                 coverImage: blog.coverImage,
                                 author: blog.author,
                                 date: blog.date,
-                                profileImage: Image.asset('name'),
+                                profileImage: blog.profileImage,
                                 title: blog.title,
                                 body: blog.body,
                                 id: blog.id,

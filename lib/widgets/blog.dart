@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class BlogCard extends StatefulWidget {
   final String coverImage;
   final String title;
-  final Image profileImage;
+  final String profileImage;
   final String author;
   final DateTime date;
   final String body;
@@ -190,6 +190,7 @@ class _BlogCardState extends State<BlogCard> {
                   date: widget.date,
                   title: widget.title,
                   blog_id: widget.id,
+                  authorImage: widget.profileImage,
                 )));
       },
       child: Container(
@@ -272,7 +273,20 @@ class _BlogCardState extends State<BlogCard> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person, color: Colors.black),
+                        CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.white,
+                          backgroundImage: widget.profileImage.isNotEmpty
+                              ? CachedNetworkImageProvider(widget.profileImage)
+                              : null,
+                          child: widget.profileImage.isEmpty
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 20,
+                                  color: Colors.black,
+                                )
+                              : null,
+                        ),
                         SizedBox(
                           width: screenWidth * 0.01,
                         ),

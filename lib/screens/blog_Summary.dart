@@ -16,6 +16,11 @@ class _BlogSummaryState extends State<BlogSummary> {
   String summary = '';
   bool isLoading = true;
   bool isSpeaking = false;
+  bool isInitialized = false;
+  
+  // TTS chunking variables
+  int currentChunk = 0;
+  List<String> textChunks = [];
 
   @override
   void initState() {
@@ -24,11 +29,56 @@ class _BlogSummaryState extends State<BlogSummary> {
     initTts();
   }
 
+  List<String> _splitTextIntoChunks(String text) {
+    List<String> chunks = [];
+    final sentences = text.split(RegExp(r'(?<=[.!?])\s+'));
+    String currentChunk = '';
+
+    for (String sentence in sentences) {
+      if (currentChunk.length + sentence.length < 1000) {
+        currentChunk += sentence + ' ';
+      } else {
+        if (currentChunk.isNotEmpty) {
+          chunks.add(currentChunk.trim());
+        }
+        currentChunk = sentence + ' ';
+      }
+    }
+    
+    if (currentChunk.isNotEmpty) {
+      chunks.add(currentChunk.trim());
+    }
+    
+    return chunks;
+  }
+
   Future<void> initTts() async {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setSpeechRate(0.5);
     await flutterTts.setVolume(1.0);
     await flutterTts.setPitch(1.0);
+
+    flutterTts.setCompletionHandler(() {
+      if (currentChunk < textChunks.length - 1) {
+        // Move to next chunk
+        currentChunk++;
+        _speakCurrentChunk();
+      } else {
+        // Reset everything when done
+        setState(() {
+          isSpeaking = false;
+          currentChunk = 0;
+        });
+      }
+    });
+
+    isInitialized = true;
+  }
+
+  Future<void> _speakCurrentChunk() async {
+    if (currentChunk < textChunks.length) {
+      await flutterTts.speak(textChunks[currentChunk]);
+    }
   }
 
   Future<void> generateSummary() async {
@@ -38,37 +88,46 @@ class _BlogSummaryState extends State<BlogSummary> {
 
       setState(() {
         if (result != null && result.content != null) {
-          summary =
-              result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
+          summary = result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
+          // Split the summary into chunks once we have it
+          textChunks = _splitTextIntoChunks(summary);
         } else {
           summary = 'Unable to generate summary.';
+          textChunks = [summary]; // Single chunk for error message
         }
         isLoading = false;
       });
     } catch (e) {
       setState(() {
         summary = 'Error generating summary: $e';
+        textChunks = [summary]; // Single chunk for error message
         isLoading = false;
       });
     }
   }
 
   Future<void> speak() async {
+    if (!isInitialized) return;
+
     if (isSpeaking) {
       await flutterTts.stop();
-      setState(() => isSpeaking = false);
+      setState(() {
+        isSpeaking = false;
+        currentChunk = 0;
+      });
     } else {
-      setState(() => isSpeaking = true);
+      setState(() {
+        isSpeaking = true;
+        currentChunk = 0;
+      });
       try {
-        var result = await flutterTts.speak(summary);
-        if (result == 1) {
-        } else {
-          print("Speech failed to start");
-        }
+        await _speakCurrentChunk();
       } catch (e) {
         print("Error occurred during speech: $e");
-      } finally {
-        setState(() => isSpeaking = false);
+        setState(() {
+          isSpeaking = false;
+          currentChunk = 0;
+        });
       }
     }
   }
@@ -88,7 +147,11 @@ class _BlogSummaryState extends State<BlogSummary> {
         actions: [
           IconButton(
             onPressed: isLoading ? null : speak,
-            icon: Icon(isSpeaking ? Icons.stop : Icons.volume_up_rounded),
+            icon: Icon(
+              isSpeaking ? Icons.stop_circle : Icons.volume_up,
+              color: Colors.white, // Or your theme color
+            ),
+            tooltip: isSpeaking ? 'Stop Reading' : 'Read Summary',
           ),
         ],
       ),
@@ -98,7 +161,7 @@ class _BlogSummaryState extends State<BlogSummary> {
           child: Center(
             child: isLoading
                 ? const CircularProgressIndicator()
-                : Text(
+                : SelectableText( // Changed to SelectableText for better user experience
                     summary,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
