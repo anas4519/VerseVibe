@@ -39,7 +39,6 @@ router.post("/signin", async (req, res) => {
       name: user.fullName,
     });
   } catch (error) {
-    console.error("Error during signin: ", error.message);
     return res.status(401).json({ error: error.message });
   }
 });

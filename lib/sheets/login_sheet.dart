@@ -4,6 +4,7 @@ import 'package:blogs_app/screens/home_screen.dart';
 import 'package:blogs_app/screens/password_reset/forgot_password1.dart';
 import 'package:blogs_app/services/auth_service.dart';
 import 'package:blogs_app/sheets/register_sheet.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -38,6 +39,7 @@ class _LoginSheetState extends State<LoginSheet> {
 
   Future<void> postData(
       String email, String password, BuildContext context) async {
+    showLoadingDialog(context, 'Logging you in...');
     final url = Uri.parse('${Constants.url}user/signin');
     final headers = {
       'Content-Type': 'application/json',
@@ -49,9 +51,7 @@ class _LoginSheetState extends State<LoginSheet> {
       final navigator = Navigator.of(context);
       final response = await http.post(url, headers: headers, body: body);
 
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
-
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         userProvier.setUser(response.body);
@@ -63,18 +63,15 @@ class _LoginSheetState extends State<LoginSheet> {
             (route) => false);
       } else if (response.statusCode == 401) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonDecode(response.body)['error'])));
+        showSnackBar(context, jsonDecode(response.body)['error']);
       }
       // else {
       //   print('Error: ${response.statusCode} - ${response.reasonPhrase}');
       // }
     } catch (error) {
-      print('Error: $error');
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: $error'),
-      ));
+      Navigator.of(context).pop();
+      showSnackBar(context, 'Error logging in!');
     }
   }
 
@@ -224,7 +221,8 @@ class _LoginSheetState extends State<LoginSheet> {
                   InkWell(
                     child: const Text('Forgot Password?'),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> const ForgotPassword1()));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (ctx) => const ForgotPassword1()));
                     },
                   )
                 ],

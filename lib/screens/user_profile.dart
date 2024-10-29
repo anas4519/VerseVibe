@@ -22,10 +22,6 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _refresh() async {
-    setState(() {});
-  }
-
   Future<void> _pickAndUploadImage() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
@@ -238,6 +234,15 @@ class _UserProfileState extends State<UserProfile> {
                                 },
                                 onEdited: () {
                                   setState(() {});
+                                },
+                                onSaved: (bool saved) {
+                                  if (saved) {
+                                    showSnackBar(
+                                        context, 'Blog added to Favourites!');
+                                  } else {
+                                    showSnackBar(context,
+                                        'Blog removed from Favourites.');
+                                  }
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),

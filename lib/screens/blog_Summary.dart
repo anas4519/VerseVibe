@@ -1,3 +1,4 @@
+import 'package:blogs_app/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -17,7 +18,7 @@ class _BlogSummaryState extends State<BlogSummary> {
   bool isLoading = true;
   bool isSpeaking = false;
   bool isInitialized = false;
-  
+
   // TTS chunking variables
   int currentChunk = 0;
   List<String> textChunks = [];
@@ -44,11 +45,11 @@ class _BlogSummaryState extends State<BlogSummary> {
         currentChunk = sentence + ' ';
       }
     }
-    
+
     if (currentChunk.isNotEmpty) {
       chunks.add(currentChunk.trim());
     }
-    
+
     return chunks;
   }
 
@@ -88,7 +89,8 @@ class _BlogSummaryState extends State<BlogSummary> {
 
       setState(() {
         if (result != null && result.content != null) {
-          summary = result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
+          summary =
+              result.content!.parts?.firstOrNull?.text ?? 'No summary content.';
           // Split the summary into chunks once we have it
           textChunks = _splitTextIntoChunks(summary);
         } else {
@@ -160,8 +162,11 @@ class _BlogSummaryState extends State<BlogSummary> {
           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
           child: Center(
             child: isLoading
-                ? const CircularProgressIndicator()
-                : SelectableText( // Changed to SelectableText for better user experience
+                ? CircularProgressIndicator(
+                    color: Constants.yellow,
+                  )
+                : SelectableText(
+                    // Changed to SelectableText for better user experience
                     summary,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),

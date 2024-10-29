@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:blogs_app/constants/constants.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,11 @@ class VerifyOtp extends StatefulWidget {
   final String email;
   final String name;
   final String password;
-  const VerifyOtp({super.key, required this.email, required this.name, required this.password});
+  const VerifyOtp(
+      {super.key,
+      required this.email,
+      required this.name,
+      required this.password});
 
   @override
   State<VerifyOtp> createState() => _VerifyOtpState();
@@ -92,31 +97,32 @@ class _VerifyOtpState extends State<VerifyOtp> {
     );
   }
 
-  Future<void> checkOTP(
-      BuildContext context, String otp) async {
+  Future<void> checkOTP(BuildContext context, String otp) async {
+    showLoadingDialog(context, 'Verifying OTP...');
     final url = Uri.parse('${Constants.uri}verify-otp');
     final headers = {
       'Content-Type': 'application/json',
     };
-    final body =
-        json.encode({"fullName": widget.name, "email": widget.email, "password": widget.password, "otp" : otp});
-
-    print('Sending request with body: $body'); // Add this line for debugging
+    final body = json.encode({
+      "fullName": widget.name,
+      "email": widget.email,
+      "password": widget.password,
+      "otp": otp
+    });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
-        print('Verified!');
         Navigator.of(context).pop();
+        showSnackBar(context,
+            'Account created successfully, login with the same credentials!');
       } else {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (error) {
-      print('Exception: $error');
+      Navigator.of(context).pop();
+      showSnackBar(context, 'Error verifying OTP!');
     }
   }
 

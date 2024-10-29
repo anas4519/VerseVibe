@@ -19,6 +19,8 @@ class BlogCard extends StatefulWidget {
   final bool selfBlog;
   final VoidCallback onDelete;
   final VoidCallback onEdited;
+  final void Function(bool) onSaved;
+
 
   const BlogCard({
     super.key,
@@ -31,7 +33,7 @@ class BlogCard extends StatefulWidget {
     required this.id,
     required this.selfBlog,
     required this.onDelete,
-    required this.onEdited,
+    required this.onEdited, required this.onSaved,
   });
 
   @override
@@ -71,6 +73,8 @@ class _BlogCardState extends State<BlogCard> {
     setState(() {
       isSaved = !isSaved;
     });
+    if(isSaved) widget.onSaved(true);
+    else widget.onSaved(false);
   }
 
   String calculateReadTime(String body) {
@@ -81,25 +85,36 @@ class _BlogCardState extends State<BlogCard> {
   }
 
   Future<void> _deleteBlog(String id, BuildContext context) async {
-    final response = await http.delete(
-      Uri.parse('${Constants.url}blogs/$id'), // Adjust the URL as needed
-    );
+    showLoadingDialog(context, 'Deleting blog...');
 
-    if (response.statusCode == 200) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      List<String>? bookmarkedBlogs =
-          prefs.getStringList('bookmarkedBlogs') ?? [];
-      if (bookmarkedBlogs.contains(id)) {
-        bookmarkedBlogs.remove(id);
-        await prefs.setStringList('bookmarkedBlogs', bookmarkedBlogs);
-      }
-      showSnackBar(context, 'Blog deleted successfully!');
+    try {
+      final response = await http.delete(
+        Uri.parse('${Constants.url}blogs/$id'),
+      );
 
+      // First pop the loading dialog
       Navigator.of(context).pop();
-      widget.onDelete();
-    } else {
-      // Show an error message
-      showSnackBar(context, 'Failed to delete blog.');
+
+      if (response.statusCode == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        List<String>? bookmarkedBlogs =
+            prefs.getStringList('bookmarkedBlogs') ?? [];
+        if (bookmarkedBlogs.contains(id)) {
+          bookmarkedBlogs.remove(id);
+          await prefs.setStringList('bookmarkedBlogs', bookmarkedBlogs);
+        }
+        showSnackBar(context, 'Blog deleted successfully!');
+
+        // Pop the confirmation dialog
+        Navigator.of(context).pop();
+        widget.onDelete();
+      } else {
+        showSnackBar(context, 'Failed to delete blog.');
+      }
+    } catch (e) {
+      // Pop the loading dialog in case of error
+      Navigator.of(context).pop();
+      showSnackBar(context, 'Error deleting blog: $e');
     }
   }
 
@@ -223,24 +238,13 @@ class _BlogCardState extends State<BlogCard> {
                 ),
                 Positioned(
                   top: 10, // Adjust positioning as needed
-                  left: 10, // Adjust positioning as needed
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.share,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {},
-                  ),
-                ),
-                Positioned(
-                  top: 10, // Adjust positioning as needed
                   right: 10, // Adjust positioning as needed
                   child: IconButton(
                     icon: Icon(
                       widget.selfBlog
                           ? Icons.more_vert
                           : (isSaved ? Icons.bookmark : Icons.bookmark_border),
-                      color: Colors.black,
+                      color: Constants.yellow,
                     ),
                     onPressed: () {
                       if (widget.selfBlog) {
@@ -249,7 +253,6 @@ class _BlogCardState extends State<BlogCard> {
                         _showPopupMenu(context, button);
                       } else {
                         _toggleBookmark();
-                        widget.onEdited();
                       }
                     },
                   ),

@@ -24,6 +24,7 @@ class _NewBlogState extends State<NewBlog> {
 
   Future<void> postData(
       String title, String body, XFile image, BuildContext context) async {
+    showLoadingDialog(context, 'Posting Blog...');
     final url =
         Uri.parse('${Constants.url}blogs/'); // Replace with your actual URL
 
@@ -44,6 +45,8 @@ class _NewBlogState extends State<NewBlog> {
 
       // Send the request
       var response = await request.send();
+
+      Navigator.of(context).pop();
 
       if (response.statusCode == 200) {
         showSnackBar(context, 'Blog posted successfully!');
@@ -74,8 +77,6 @@ class _NewBlogState extends State<NewBlog> {
       _imageFile = null;
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +151,7 @@ class _NewBlogState extends State<NewBlog> {
                       return null;
                     },
                   ),
-                ),                
+                ),
                 SizedBox(height: screenHeight * 0.02),
                 Container(
                   height: screenHeight * 0.2,

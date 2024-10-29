@@ -1,4 +1,5 @@
 import 'package:blogs_app/constants/constants.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:blogs_app/widgets/blog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,9 +102,11 @@ class _SavedBlogsState extends State<SavedBlogs> {
                   children: [
                     BlogCard(
                       coverImage: blog['coverImageURL'],
-                      author: blog['createdBy']['fullName'], // Extract author name
+                      author: blog['createdBy']
+                          ['fullName'], // Extract author name
                       date: DateTime.parse(blog['createdAt']),
-                      profileImage: blog['createdBy']['profileImageURL'], // Extract profile image URL
+                      profileImage: blog['createdBy']['profileImageURL'] ??
+                          '', // Extract profile image URL
                       title: blog['title'],
                       body: blog['body'],
                       id: blog['_id'],
@@ -111,6 +114,13 @@ class _SavedBlogsState extends State<SavedBlogs> {
                       onDelete: () {},
                       onEdited: () {
                         setState(() {});
+                      },
+                      onSaved: (bool saved) {
+                        if (saved) {
+                          showSnackBar(context, 'Blog added to Favourites!');
+                        } else {
+                          showSnackBar(context, 'Blog removed from Favourites.');
+                        }
                       },
                     ),
                     SizedBox(height: screenHeight * 0.02),

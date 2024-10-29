@@ -53,6 +53,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   }
 
   Future<void> _changePassword(String email, String password) async {
+    showLoadingDialog(context, 'Changing Password...');
     final url = Uri.parse(
         '${Constants.uri}resetPassword'); // Replace with your actual API URL
 
@@ -67,7 +68,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           'password': password,
         }),
       );
-
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
         // Password changed successfully
         showSnackBar(context, 'Password changed successfully!');
@@ -81,7 +82,9 @@ class _ResetPasswordState extends State<ResetPassword> {
             context, responseBody['status'] ?? 'Failed to change password');
       }
     } catch (error) {
-      showSnackBar(context, 'Error: $error');
+      Navigator.of(context).pop();
+      showSnackBar(
+          context, 'Unexpected error occured while changing password!');
     }
   }
 

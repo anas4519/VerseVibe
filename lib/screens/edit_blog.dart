@@ -43,6 +43,7 @@ class _EditBlogState extends State<EditBlog> {
   }
 
   Future<void> _updateBlog() async {
+    showLoadingDialog(context, 'Saving Changes...');
     final response = await http.patch(
       Uri.parse('${Constants.url}blogs/${widget.blogId}'),
       headers: {
@@ -53,7 +54,7 @@ class _EditBlogState extends State<EditBlog> {
         'body': _bodyController.text,
       }),
     );
-
+    Navigator.of(context).pop();
     if (response.statusCode == 200) {
       Navigator.of(context).pop();
       Navigator.of(context).pop();

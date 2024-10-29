@@ -62,13 +62,14 @@ class _ForgotPassword2State extends State<ForgotPassword2> {
   // Function to verify OTP
   Future<void> verifyOtpToChangePassword(
       String email, String otp, BuildContext context) async {
+    showLoadingDialog(context, 'Verifying OTP...');
     final url = Uri.parse('${Constants.uri}verifyOTPToChangePassword');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'email': email, 'otp': otp});
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
         if (result == true) {
@@ -83,8 +84,8 @@ class _ForgotPassword2State extends State<ForgotPassword2> {
         showSnackBar(context, 'OTP verification failed!');
       }
     } catch (error) {
-      // Handle exceptions
-      showSnackBar(context, 'Error: $error');
+      Navigator.of(context).pop();
+      showSnackBar(context, 'Unexpected error occured while verifying OTP!');
     }
   }
 

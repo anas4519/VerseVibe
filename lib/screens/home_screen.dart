@@ -146,8 +146,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       setState(() {});
                                     },
                                     onEdited: () {
-                                      showSnackBar(
-                                          context, 'Blog added to Favourites!');
+                                      setState(() {
+                                        
+                                      });
+                                    },
+                                    onSaved: (bool saved){
+                                      if(saved) showSnackBar(context, 'Blog added to Favourites!');
+                                      else showSnackBar(context, 'Blog removed from Favourites.');
                                     },
                                   ),
                                   SizedBox(height: screenHeight * 0.02),

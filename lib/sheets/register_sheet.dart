@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:blogs_app/constants/constants.dart';
 import 'package:blogs_app/landing/verfiy_otp.dart';
 import 'package:blogs_app/sheets/login_sheet.dart';
+import 'package:blogs_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,7 @@ class RegisterSheet extends StatefulWidget {
 class _RegisterSheetState extends State<RegisterSheet> {
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
+  bool _obscureText2 = true;
 
   // Controllers to manage text input
   final TextEditingController _emailController = TextEditingController();
@@ -29,6 +31,13 @@ class _RegisterSheetState extends State<RegisterSheet> {
       _obscureText = !_obscureText;
     });
   }
+
+  void _toggleConfirmPasswordView() {
+    setState(() {
+      _obscureText2 = !_obscureText2;
+    });
+  }
+
 
   void _register() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -50,6 +59,7 @@ class _RegisterSheetState extends State<RegisterSheet> {
 
   Future<void> postData(
       String name, String email, String password, BuildContext context) async {
+    showLoadingDialog(context, 'Verifying Details...');
     final url = Uri.parse('${Constants.uri}signup');
     final headers = {
       'Content-Type': 'application/json',
@@ -57,14 +67,10 @@ class _RegisterSheetState extends State<RegisterSheet> {
     final body =
         json.encode({"fullName": name, "email": email, "password": password});
 
-    print('Sending request with body: $body'); // Add this line for debugging
-
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
+      Navigator.of(context).pop();
       if (response.statusCode == 200) {
         Navigator.of(context).pop();
         Navigator.of(context).push(MaterialPageRoute(
@@ -77,7 +83,8 @@ class _RegisterSheetState extends State<RegisterSheet> {
         print('Error: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (error) {
-      print('Exception: $error');
+      Navigator.of(context).pop();
+      showSnackBar(context, 'Error verifying details!');
     }
   }
 
@@ -270,7 +277,7 @@ class _RegisterSheetState extends State<RegisterSheet> {
               SizedBox(height: screenHeight * 0.02),
               TextFormField(
                 controller: _confirmPasswordController,
-                obscureText: _obscureText,
+                obscureText: _obscureText2,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(
                     vertical: screenHeight * 0.025,
@@ -278,10 +285,10 @@ class _RegisterSheetState extends State<RegisterSheet> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      _obscureText2 ? Icons.visibility : Icons.visibility_off,
                       color: Colors.black,
                     ),
-                    onPressed: _togglePasswordView,
+                    onPressed: _toggleConfirmPasswordView,
                   ),
                   hintText: 'Confirm Password',
                   hintStyle: const TextStyle(color: Colors.black),
