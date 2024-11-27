@@ -20,7 +20,8 @@ class GeminiScreen extends StatefulWidget {
 
 class _GeminiScreenState extends State<GeminiScreen> {
   List<ChatMessage> messages = [];
-  late ChatUser currentUser; // Ensure this is initialized properly
+  List<Content> chatHistory = [];
+  late ChatUser currentUser;
   final Gemini gemini = Gemini.instance;
   final ChatUser geminiUser = ChatUser(id: '1', firstName: 'VV Assistant');
 
@@ -116,33 +117,34 @@ class _GeminiScreenState extends State<GeminiScreen> {
     setState(() {
       messages = [chatMessage, ...messages];
     });
+
     try {
       String question = chatMessage.text;
       List<Uint8List>? images;
+
+      // Add user message to chat history
+      chatHistory.add(Content(parts: [Parts(text: question)], role: 'user'));
+
       if (chatMessage.medias?.isNotEmpty ?? false) {
         images = [File(chatMessage.medias!.first.url).readAsBytesSync()];
       }
-      gemini.streamGenerateContent(question, images: images).listen((event) {
-        ChatMessage? lastMessage = messages.firstOrNull;
-        if (lastMessage != null && lastMessage.user == geminiUser) {
-          lastMessage = messages.removeAt(0);
-          String res = event.content?.parts
-                  ?.fold("", (previous, current) => "$previous$current") ??
-              "";
-          lastMessage.text += res;
-          setState(() {
-            messages = [lastMessage!, ...messages];
-          });
-        } else {
-          String res = event.content?.parts?.fold(
-                  "", (previous, current) => "$previous${current.text}") ??
-              "";
-          ChatMessage message = ChatMessage(
-              user: geminiUser, createdAt: DateTime.now(), text: res);
-          setState(() {
-            messages = [message, ...messages];
-          });
-        }
+
+      gemini.chat(chatHistory).then((response) {
+        String res = response?.output ?? '';
+
+        // Add model's response to chat history
+        chatHistory.add(Content(parts: [Parts(text: res)], role: 'model'));
+
+        ChatMessage message =
+            ChatMessage(user: geminiUser, createdAt: DateTime.now(), text: res);
+
+        setState(() {
+          messages = [message, ...messages];
+        });
+      }).catchError((e) {
+        print('Error generating response: $e');
+        // Optionally, show an error message to the user
+        showSnackBar(context, 'Failed to get response');
       });
     } catch (e) {
       print(e);
